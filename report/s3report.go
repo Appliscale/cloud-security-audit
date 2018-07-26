@@ -1,7 +1,6 @@
 package report
 
 import (
-	"fmt"
 	"strconv"
 	"tyr/resource"
 
@@ -18,7 +17,7 @@ type S3BucketReport struct {
 
 type S3BucketReports []*S3BucketReport
 
-type s3ReportRequiredResources struct {
+type S3ReportRequiredResources struct {
 	KMSKeys   *resource.KMSKeys
 	S3Buckets *resource.S3Buckets
 }
@@ -30,10 +29,6 @@ func (s3br *S3BucketReport) CheckEncryptionType(s3EncryptionType s3.ServerSideEn
 	case "AES256":
 		s3br.EncryptionType = AES256
 	case "aws:kms":
-		if s3EncryptionType.KMSMasterKeyID == nil {
-			fmt.Println(s3br.Name, s3EncryptionType)
-
-		}
 		kmsKey := kmsKeys.FindByKeyArn(*s3EncryptionType.KMSMasterKeyID)
 		if kmsKey.Custom {
 			s3br.EncryptionType = CKMS
@@ -63,7 +58,7 @@ func (s3brs *S3BucketReports) FormatDataToTable() [][]string {
 	return data
 }
 
-func (s3brs *S3BucketReports) GenerateReport(r *s3ReportRequiredResources) {
+func (s3brs *S3BucketReports) GenerateReport(r *S3ReportRequiredResources) {
 
 	for _, s3Bucket := range *r.S3Buckets {
 		s3BucketReport := &S3BucketReport{Name: *s3Bucket.Name}
@@ -85,8 +80,8 @@ func (s3brs *S3BucketReports) GenerateReport(r *s3ReportRequiredResources) {
 	}
 }
 
-func (s3brs *S3BucketReports) GetResources(sess *session.Session) (*s3ReportRequiredResources, error) {
-	resources := &s3ReportRequiredResources{
+func (s3brs *S3BucketReports) GetResources(sess *session.Session) (*S3ReportRequiredResources, error) {
+	resources := &S3ReportRequiredResources{
 		KMSKeys:   resource.NewKMSKeys(),
 		S3Buckets: &resource.S3Buckets{},
 	}

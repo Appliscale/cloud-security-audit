@@ -1,15 +1,17 @@
 package report
 
 import (
+	"bytes"
 	"tyr/resource"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 )
 
 type Ec2Report struct {
-	VolumeReport *VolumeReport
-	InstanceID   string
-	SortableTags *SortableTags
+	VolumeReport      *VolumeReport
+	InstanceID        string
+	SortableTags      *SortableTags
+	SecurityGroupsIDs []string
 }
 
 func NewEc2Report(instanceID string) *Ec2Report {
@@ -22,14 +24,15 @@ func NewEc2Report(instanceID string) *Ec2Report {
 
 type Ec2Reports []*Ec2Report
 
-type ec2ReportRequiredResources struct {
-	Ec2s    *resource.Ec2s
-	KMSKeys *resource.KMSKeys
-	Volumes *resource.Volumes
+type Ec2ReportRequiredResources struct {
+	Ec2s           *resource.Ec2s
+	KMSKeys        *resource.KMSKeys
+	Volumes        *resource.Volumes
+	SecurityGroups *resource.SecurityGroups
 }
 
 func (e *Ec2Reports) GetHeaders() []string {
-	return []string{"EC2", "Volumes\n(None) - not encrypted\n(DKMS) - encrypted with default KMSKey", "EC2 Tags"}
+	return []string{"EC2", "Volumes\n(None) - not encrypted\n(DKMS) - encrypted with default KMSKey", "Security\n Groups", "EC2 Tags"}
 }
 func (e *Ec2Reports) FormatDataToTable() [][]string {
 	data := [][]string{}
@@ -38,6 +41,7 @@ func (e *Ec2Reports) FormatDataToTable() [][]string {
 		row := []string{
 			ec2Report.InstanceID,
 			ec2Report.VolumeReport.ToTableData(),
+			SliceOfStringsToString(ec2Report.SecurityGroupsIDs),
 			ec2Report.SortableTags.ToTableData(),
 		}
 		data = append(data, row)
@@ -45,7 +49,7 @@ func (e *Ec2Reports) FormatDataToTable() [][]string {
 	return data
 }
 
-func (e *Ec2Reports) GenerateReport(r *ec2ReportRequiredResources) {
+func (e *Ec2Reports) GenerateReport(r *Ec2ReportRequiredResources) {
 	for _, ec2 := range *r.Ec2s {
 		ec2Report := NewEc2Report(*ec2.InstanceId)
 		ec2OK := true
@@ -62,6 +66,20 @@ func (e *Ec2Reports) GenerateReport(r *ec2ReportRequiredResources) {
 				}
 			}
 		}
+
+		for _, sg := range ec2.SecurityGroups {
+			ipPermissions := r.SecurityGroups.GetIpPermissionsByID(*sg.GroupId)
+			if ipPermissions != nil {
+				for _, ipPermission := range ipPermissions {
+					for _, ipRange := range ipPermission.IpRanges {
+						if *ipRange.CidrIp == "0.0.0.0/0" {
+							ec2Report.SecurityGroupsIDs = append(ec2Report.SecurityGroupsIDs, *sg.GroupId)
+							ec2OK = false
+						}
+					}
+				}
+			}
+		}
 		if !ec2OK {
 			ec2Report.SortableTags.Add(ec2.Tags)
 			*e = append(*e, ec2Report)
@@ -70,21 +88,36 @@ func (e *Ec2Reports) GenerateReport(r *ec2ReportRequiredResources) {
 }
 
 // GetResources : Initialize and loads required resources to create ec2 report
-func (e *Ec2Reports) GetResources(sess *session.Session) (*ec2ReportRequiredResources, error) {
-	resources := &ec2ReportRequiredResources{
-		KMSKeys: resource.NewKMSKeys(),
-		Ec2s:    &resource.Ec2s{},
-		Volumes: &resource.Volumes{},
+func (e *Ec2Reports) GetResources(sess *session.Session) (*Ec2ReportRequiredResources, error) {
+	resources := &Ec2ReportRequiredResources{
+		KMSKeys:        resource.NewKMSKeys(),
+		Ec2s:           &resource.Ec2s{},
+		Volumes:        &resource.Volumes{},
+		SecurityGroups: &resource.SecurityGroups{},
 	}
 	err := resource.LoadResources(
 		sess,
 		resources.Ec2s,
 		resources.KMSKeys,
 		resources.Volumes,
+		resources.SecurityGroups,
 	)
 	if err != nil {
 		return nil, err
 	}
 
 	return resources, nil
+}
+
+func SliceOfStringsToString(slice []string) string {
+	n := len(slice)
+	if n == 0 {
+		return ""
+	}
+	var buffer bytes.Buffer
+	for _, s := range slice[:n-1] {
+		buffer.WriteString(s + "\n")
+	}
+	buffer.WriteString(slice[n-1])
+	return buffer.String()
 }

@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestEC2ReportIfVolumeEncryptedWithDefaultKMSLineHasSuffixDKMS(t *testing.T) {
+func TestEC2Report_IfVolumeEncryptedWithDefaultKMSLineHasSuffixDKMS(t *testing.T) {
 	kmsKeyArn := "arn:aws:kms:us-east-1:123456789101:key/abcdefgh-1234-5678-1234-abcdefghijkl"
 	volumeID := "vol-111"
 	volume := &ec2.Volume{
@@ -31,8 +31,7 @@ func TestEC2ReportIfVolumeEncryptedWithDefaultKMSLineHasSuffixDKMS(t *testing.T)
 	}
 	kmsKeys := resource.NewKMSKeys()
 	kmsKeys.Values[kmsKeyArn] = &resource.KMSKey{Custom: false}
-
-	r := &resource.Resources{
+	r := &Ec2ReportRequiredResources{
 		Ec2s:    &resource.Ec2s{instance},
 		Volumes: &resource.Volumes{volume},
 		KMSKeys: kmsKeys,
@@ -43,7 +42,7 @@ func TestEC2ReportIfVolumeEncryptedWithDefaultKMSLineHasSuffixDKMS(t *testing.T)
 	assert.Equal(t, volumeID+"[DKMS]", (*(*ec2Reports)[0].VolumeReport)[0])
 }
 
-func TestEC2ReportIfVolumeNotEncryptedLineHasSuffixNone(t *testing.T) {
+func TestEC2Report_IfVolumeNotEncryptedLineHasSuffixNone(t *testing.T) {
 
 	volumeID := "vol-111"
 	volume := &ec2.Volume{
@@ -59,7 +58,7 @@ func TestEC2ReportIfVolumeNotEncryptedLineHasSuffixNone(t *testing.T) {
 		InstanceId:          &volumeID,
 		BlockDeviceMappings: []*ec2.InstanceBlockDeviceMapping{instanceBlockDeviceMapping},
 	}
-	r := &resource.Resources{
+	r := &Ec2ReportRequiredResources{
 		Ec2s:    &resource.Ec2s{instance},
 		Volumes: &resource.Volumes{volume},
 		KMSKeys: resource.NewKMSKeys(),
@@ -70,7 +69,7 @@ func TestEC2ReportIfVolumeNotEncryptedLineHasSuffixNone(t *testing.T) {
 	assert.Equal(t, volumeID+"[NONE]", (*(*ec2Reports)[0].VolumeReport)[0])
 }
 
-func TestEC2ReportIfTagsInTableDataAreFormattedCorrectly(t *testing.T) {
+func TestEC2Report_IfTagsInTableDataAreFormattedCorrectly(t *testing.T) {
 
 	instanceID := "i-1"
 	ec2Tags := []*ec2.Tag{
@@ -89,7 +88,8 @@ func TestEC2ReportIfTagsInTableDataAreFormattedCorrectly(t *testing.T) {
 
 	ec2Reports := Ec2Reports{ec2Report1}
 	tableData := ec2Reports.FormatDataToTable()
-	formattedTags := strings.Split(tableData[0][2], "\n")
+
+	formattedTags := strings.Split(tableData[0][3], "\n")
 	sort.Strings(formattedTags)
 
 	assert.True(t, len(formattedTags) == 2)
