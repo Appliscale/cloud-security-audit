@@ -44,6 +44,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&config.Service, "service", "s", "", "specify aws service to scan in your account,e.g. --service [ec2:x,ec2:image]")
 	rootCmd.MarkFlagRequired("service")
 
+	rootCmd.Flags().StringVarP(&config.Profile, "profile", "p", "", "specify aws profile e.g. --profile appliscale")
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")

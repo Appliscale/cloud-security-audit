@@ -2,6 +2,7 @@ package report
 
 import (
 	"strconv"
+	"tyr/configuration"
 	"tyr/resource"
 
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -80,17 +81,17 @@ func (s3brs *S3BucketReports) GenerateReport(r *S3ReportRequiredResources) {
 	}
 }
 
-func (s3brs *S3BucketReports) GetResources(sess *session.Session) (*S3ReportRequiredResources, error) {
+func (s3brs *S3BucketReports) GetResources(sess *session.Session, config *configuration.Config) (*S3ReportRequiredResources, error) {
 	resources := &S3ReportRequiredResources{
 		KMSKeys:   resource.NewKMSKeys(),
 		S3Buckets: &resource.S3Buckets{},
 	}
 
-	err := resources.S3Buckets.LoadFromAWS(sess)
+	err := resources.S3Buckets.LoadFromAWS(sess, config)
 	if err != nil {
 		return nil, err
 	}
-	err = resources.KMSKeys.LoadAllFromAWS()
+	err = resources.KMSKeys.LoadAllFromAWS(sess, config)
 	if err != nil {
 		return nil, err
 	}

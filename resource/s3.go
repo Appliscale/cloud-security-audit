@@ -3,6 +3,7 @@ package resource
 import (
 	"fmt"
 	"sync"
+	"tyr/configuration"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -80,11 +81,19 @@ func (b *S3Buckets) LoadNames(sess *session.Session) error {
 	return nil
 }
 
-func getRegionMapOfS3APIs(s3Buckets S3Buckets) (map[string]*s3.S3, error) {
+func getRegionMapOfS3APIs(s3Buckets S3Buckets, config *configuration.Config) (map[string]*s3.S3, error) {
 	regionS3APIs := make(map[string]*s3.S3)
 	for _, bucket := range s3Buckets {
 		if _, ok := regionS3APIs[*bucket.Region]; !ok {
-			if sess, err := session.NewSession(&aws.Config{Region: bucket.Region}); err == nil {
+			sess, err := session.NewSessionWithOptions(
+				session.Options{
+					Config: aws.Config{
+						Region: bucket.Region,
+					},
+					Profile: config.Profile,
+				},
+			)
+			if err == nil {
 				regionS3APIs[*bucket.Region] = s3.New(sess)
 			} else {
 				return nil, err
@@ -98,7 +107,7 @@ func getRegionMapOfS3APIs(s3Buckets S3Buckets) (map[string]*s3.S3, error) {
 	return regionS3APIs, nil
 }
 
-func (b *S3Buckets) LoadFromAWS(sess *session.Session) error {
+func (b *S3Buckets) LoadFromAWS(sess *session.Session, config *configuration.Config) error {
 
 	err := b.LoadNames(sess)
 	if err != nil {
@@ -110,7 +119,7 @@ func (b *S3Buckets) LoadFromAWS(sess *session.Session) error {
 		return err
 	}
 
-	regionS3APIs, err := getRegionMapOfS3APIs(*b)
+	regionS3APIs, err := getRegionMapOfS3APIs(*b, config)
 	if err != nil {
 		return err
 	}

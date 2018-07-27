@@ -13,7 +13,14 @@ import (
 
 func Run(config *configuration.Config) error {
 
-	sess, err := session.NewSession(&aws.Config{Region: &config.Region})
+	sess, err := session.NewSessionWithOptions(
+		session.Options{
+			Config: aws.Config{
+				Region: &config.Region,
+			},
+			Profile: config.Profile,
+		},
+	)
 	if err != nil {
 		return err
 	}
@@ -29,7 +36,7 @@ func Run(config *configuration.Config) error {
 		report.PrintTable(&ec2Reports)
 	case "s3":
 		s3BucketReports := report.S3BucketReports{}
-		resources, err := s3BucketReports.GetResources(sess)
+		resources, err := s3BucketReports.GetResources(sess, config)
 		if err != nil {
 			return err
 		}
