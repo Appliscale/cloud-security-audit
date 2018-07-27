@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"tyr/configuration"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -32,7 +33,7 @@ type KMSKeyAliases []*kms.AliasListEntry
 
 type KMSKeysListEntries []*kms.KeyListEntry
 
-func getRegionMapOfKMSAPIs() (map[string]*kms.KMS, error) {
+func getRegionMapOfKMSAPIs(sess *session.Session, config *configuration.Config) (map[string]*kms.KMS, error) {
 	regions := []string{
 		"us-east-2",
 		"us-east-1",
@@ -53,7 +54,15 @@ func getRegionMapOfKMSAPIs() (map[string]*kms.KMS, error) {
 	}
 	regionSessions := make(map[string]*kms.KMS)
 	for _, region := range regions {
-		if sess, err := session.NewSession(&aws.Config{Region: &region}); err == nil {
+		sess, err := session.NewSessionWithOptions(
+			session.Options{
+				Config: aws.Config{
+					Region: &region,
+				},
+				Profile: config.Profile,
+			},
+		)
+		if err == nil {
 			regionSessions[region] = kms.New(sess)
 		} else {
 			return nil, err
@@ -63,8 +72,8 @@ func getRegionMapOfKMSAPIs() (map[string]*kms.KMS, error) {
 }
 
 // LoadAllFromAWS : Load KMS Keys from all regions
-func (k *KMSKeys) LoadAllFromAWS() error {
-	regionSessions, err := getRegionMapOfKMSAPIs()
+func (k *KMSKeys) LoadAllFromAWS(sess *session.Session, config *configuration.Config) error {
+	regionSessions, err := getRegionMapOfKMSAPIs(sess, config)
 	if err != nil {
 		return err
 	}
