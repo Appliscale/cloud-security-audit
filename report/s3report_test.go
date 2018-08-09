@@ -16,7 +16,7 @@ func TestS3Report_WhenSSEAlgorithmIsAES256CheckEncryptionTypeReturnsAES256(t *te
 	AES256Rule := s3.ServerSideEncryptionByDefault{
 		SSEAlgorithm: aws.String("AES256"),
 	}
-	s3BucketReport.CheckEncryptionType(AES256Rule, resource.NewKMSKeys())
+	s3BucketReport.checkEncryptionType(AES256Rule, resource.NewKMSKeys())
 	assert.Equal(t, AES256, s3BucketReport.EncryptionType)
 }
 
