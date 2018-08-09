@@ -1,7 +1,7 @@
 package main
 
 import (
-	"tyr/cmd"
+	"github.com/Appliscale/tyr/cmd"
 )
 
 func main() {
