@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.9
-        working_directory: /go/src/github.com/Appliscale/tyr
+    working_directory: /go/src/github.com/Appliscale/tyr
     steps:
       - checkout
       - run: make get-deps
