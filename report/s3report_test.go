@@ -2,8 +2,8 @@ package report
 
 import (
 	"fmt"
+	"github.com/Appliscale/tyr/resource"
 	"testing"
-	"tyr/resource"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"

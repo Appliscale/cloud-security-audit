@@ -2,8 +2,8 @@ package resource
 
 import (
 	"fmt"
+	"github.com/Appliscale/tyr/configuration"
 	"sync"
-	"tyr/configuration"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"

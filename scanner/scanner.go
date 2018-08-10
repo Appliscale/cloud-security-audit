@@ -2,9 +2,9 @@ package scanner
 
 import (
 	"fmt"
+	"github.com/Appliscale/tyr/configuration"
+	"github.com/Appliscale/tyr/report"
 	"strings"
-	"tyr/configuration"
-	"tyr/report"
 
 	"github.com/aws/aws-sdk-go/aws"
 

@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/Appliscale/tyr/configuration"
+	"github.com/Appliscale/tyr/scanner"
+	"github.com/Appliscale/tyr/tyrlogger"
 	"os"
-	"tyr/configuration"
-	"tyr/scanner"
-	"tyr/tyrlogger"
 
 	"github.com/spf13/cobra"
 )
