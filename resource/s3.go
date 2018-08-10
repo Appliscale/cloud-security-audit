@@ -108,7 +108,6 @@ func getRegionMapOfS3APIs(s3Buckets S3Buckets, config *configuration.Config) (ma
 }
 
 func (b *S3Buckets) LoadFromAWS(sess *session.Session, config *configuration.Config) error {
-
 	err := b.LoadNames(sess)
 	if err != nil {
 		return err
