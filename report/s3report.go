@@ -2,8 +2,8 @@ package report
 
 import (
 	"strconv"
-	"tyr/configuration"
-	"tyr/resource"
+	"github.com/Appliscale/tyr/configuration"
+	"github.com/Appliscale/tyr/resource"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 

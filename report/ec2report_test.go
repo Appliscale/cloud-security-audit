@@ -4,7 +4,7 @@ import (
 	"sort"
 	"strings"
 	"testing"
-	"tyr/resource"
+	"github.com/Appliscale/tyr/resource"
 
 	"github.com/aws/aws-sdk-go/aws"
 

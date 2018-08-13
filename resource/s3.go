@@ -3,9 +3,9 @@ package resource
 import (
 	"fmt"
 	"sync"
-	"tyr/configuration"
+	"github.com/Appliscale/tyr/configuration"
+	"github.com/Appliscale/tyr/tyrsession"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -81,32 +81,6 @@ func (b *S3Buckets) LoadNames(sess *session.Session) error {
 	return nil
 }
 
-func getRegionMapOfS3APIs(s3Buckets S3Buckets, config *configuration.Config) (map[string]*s3.S3, error) {
-	regionS3APIs := make(map[string]*s3.S3)
-	for _, bucket := range s3Buckets {
-		if _, ok := regionS3APIs[*bucket.Region]; !ok {
-			sess, err := session.NewSessionWithOptions(
-				session.Options{
-					Config: aws.Config{
-						Region: bucket.Region,
-					},
-					Profile: config.Profile,
-				},
-			)
-			if err == nil {
-				regionS3APIs[*bucket.Region] = s3.New(sess)
-			} else {
-				return nil, err
-			}
-		}
-		// TODO : Add some check to stop iteration
-		// if len(regionS3APIs) >= 17 {
-		// 	break
-		// }
-	}
-	return regionS3APIs, nil
-}
-
 func (b *S3Buckets) LoadFromAWS(sess *session.Session, config *configuration.Config) error {
 
 	err := b.LoadNames(sess)
@@ -115,11 +89,6 @@ func (b *S3Buckets) LoadFromAWS(sess *session.Session, config *configuration.Con
 	}
 
 	err = b.LoadRegions(sess)
-	if err != nil {
-		return err
-	}
-
-	regionS3APIs, err := getRegionMapOfS3APIs(*b, config)
 	if err != nil {
 		return err
 	}
@@ -137,11 +106,18 @@ func (b *S3Buckets) LoadFromAWS(sess *session.Session, config *configuration.Con
 	}()
 
 	for _, s3Bucket := range *b {
-		regionS3API := regionS3APIs[*s3Bucket.Region]
+		s3Client, err := config.ClientFactory.GetS3Client(
+			tyrsession.SessionConfig{
+				Profile: config.Profile,
+				Region:  *s3Bucket.Region,
+			})
+		if err != nil {
+			return err
+		}
 		// TODO : Need to add struct for s3 bucket policy
-		// go getPolicy(s3Bucket, regionS3API, done, errs, &wg)
-		go getEncryption(s3Bucket, regionS3API, done, errs, &wg)
-		go getBucketLogging(s3Bucket, regionS3API, done, errs, &wg)
+		// go getPolicy(s3Bucket, s3Client, done, errs, &wg)
+		go getEncryption(s3Bucket, s3Client, done, errs, &wg)
+		go getBucketLogging(s3Bucket, s3Client, done, errs, &wg)
 	}
 	for i := 0; i < n; i++ {
 		select {
