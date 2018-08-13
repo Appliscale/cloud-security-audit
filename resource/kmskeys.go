@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/tyrsession"
 

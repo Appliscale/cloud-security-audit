@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/scanner"
 	"github.com/Appliscale/tyr/tyrlogger"

@@ -3,6 +3,7 @@ package scanner
 import (
 	"fmt"
 	"strings"
+
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/report"
 

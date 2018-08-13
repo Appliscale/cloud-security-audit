@@ -3,6 +3,7 @@ package report
 import (
 	"fmt"
 	"testing"
+
 	"github.com/Appliscale/tyr/resource"
 
 	"github.com/aws/aws-sdk-go/aws"

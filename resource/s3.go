@@ -3,6 +3,7 @@ package resource
 import (
 	"fmt"
 	"sync"
+
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/tyrsession"
 
