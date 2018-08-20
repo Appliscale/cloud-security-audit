@@ -1,7 +1,6 @@
 package resource
 
 import (
-	"encoding/json"
 	"fmt"
 	"sync"
 
@@ -23,95 +22,6 @@ type S3Bucket struct {
 }
 
 type S3Buckets []*S3Bucket
-
-type S3Policy struct {
-	Version    string
-	Id         string      `json:",omitempty"`
-	Statements []Statement `json:"Statement"`
-}
-
-func NewS3Policy(s string) (*S3Policy, error) {
-	b := []byte(s)
-	s3Policy := &S3Policy{}
-	err := json.Unmarshal(b, s3Policy)
-	if err != nil {
-		return nil, err
-	}
-	return s3Policy, nil
-}
-
-type Statement struct {
-	Effect    string
-	Principal Principal
-	Actions   Actions `json:"Action"`
-	Resource  string
-	Condition Condition `json:",omitempty"`
-}
-
-type Condition struct {
-	Bool map[string]string `json:",omitempty"`
-	Null map[string]string `json:",omitempty"`
-}
-
-type Actions []string
-
-func (a *Actions) UnmarshalJSON(b []byte) error {
-
-	array := []string{}
-	err := json.Unmarshal(b, &array)
-	/*
-		if error is: "json: cannot unmarshal string into Go value of type []string"
-		then fallback to unmarshaling string
-	*/
-	if err != nil {
-		s := ""
-		err = json.Unmarshal(b, &s)
-		if err != nil {
-			return err
-		}
-		*a = append(*a, s)
-		return nil
-	}
-	for _, action := range array {
-		*a = append(*a, action)
-	}
-	return nil
-}
-
-// Principal : Specifies user, account, service or other
-// 			   entity that is allowed or denied access to resource
-type Principal struct {
-	Map      map[string][]string // Values in Map: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html
-	Wildcard string              // Values: *
-}
-
-func (p *Principal) UnmarshalJSON(b []byte) error {
-	p.Map = make(map[string][]string)
-	s := ""
-	err := json.Unmarshal(b, &s)
-	if err != nil {
-		m := make(map[string]interface{})
-
-		err = json.Unmarshal(b, &m)
-		if err != nil {
-			return err
-		}
-		for key, value := range m {
-			switch t := value.(type) {
-			case string:
-				p.Map[key] = append(p.Map[key], value.(string))
-			case []interface{}:
-				for _, elem := range value.([]interface{}) {
-					p.Map[key] = append(p.Map[key], elem.(string))
-				}
-			default:
-				fmt.Printf("type: %T\n", t)
-			}
-		}
-	}
-	p.Wildcard = s
-	return nil
-}
 
 func (b *S3Buckets) LoadRegions(sess *session.Session) error {
 	sess.Handlers.Unmarshal.PushBackNamed(s3.NormalizeBucketLocationHandler)
@@ -257,17 +167,11 @@ func getPolicy(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errc chan error
 		return
 	}
 	if result.Policy != nil {
-/*		s3Bucket.S3Policy, err = NewS3Policy(*result.Policy)
+		s3Bucket.S3Policy, err = NewS3Policy(*result.Policy)
 		if err != nil {
 			errc <- fmt.Errorf("[ERROR] Bucket: %s Error Msg: %s", *s3Bucket.Name, err.Error())
 			return
 		}
-*/
-		bucketPolicy, conversionError := convertJSONtoStruct(result.Policy)
-		if conversionError != nil {
-			errc <- fmt.Errorf("[ERROR] %s: %s", *s3Bucket.Name, err.Error())
-		}
-		s3Bucket.S3Policy = bucketPolicy
 	}
 	done <- true
 }
@@ -330,14 +234,4 @@ func getBucketLogging(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errs cha
 	}
 	s3Bucket.LoggingEnabled = result.LoggingEnabled
 	done <- true
-}
-
-func convertJSONtoStruct(result *string) (bucketPolicy BucketPolicy, err error) {
-	policy := *result
-	err = json.Unmarshal([]byte(policy), &bucketPolicy)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return bucketPolicy, err
-
 }

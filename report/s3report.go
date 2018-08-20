@@ -1,7 +1,6 @@
 package report
 
 import (
-	"fmt"
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/resource"
 	"strconv"
@@ -45,7 +44,7 @@ func (s3br *S3BucketReport) CheckEncryptionType(s3EncryptionType s3.ServerSideEn
 }
 
 func (s3brs *S3BucketReports) GetHeaders() []string {
-	return []string{"Bucket Name", "Default SSE", "Logging Enabled", "ACL is public", "Policy is public"}
+	return []string{"Bucket Name", "Default SSE", "Logging Enabled", "ACL - is public", "Policy - is public"}
 }
 
 func (s3brs *S3BucketReports) FormatDataToTable() [][]string {
@@ -108,65 +107,51 @@ func isBucketACLPublic(s3Bucket *resource.S3Bucket) bool {
 
 func isBucketPolicyPublic(s3Bucket *resource.S3Bucket) bool {
 	isPublic := make(map[string]bool)
-	bucketPolicy := s3Bucket.S3Policy
-	stat := bucketPolicy.Statement
+	if s3Bucket.S3Policy != nil {
+		bucketPolicy := s3Bucket.S3Policy
+		stat := bucketPolicy.Statements
 
-	if len(stat) > 0 {
-		for _, b := range stat {
-			isPublic["Effect"] = false
-			isPublic["Action"] = false
-			isPublic["Principal"] = false
-			actionType := checkType(b.Action)
-			principalType := checkType(b.Principal)
+		if len(stat) > 0 {
+			for _, element := range stat {
+				isPublic["Effect"] = false
+				isPublic["Action"] = false
+				isPublic["Principal"] = false
 
-			if actionType == "string" {
-				if b.Action.(string) != "" {
+				//Effect
+				if element.Effect == "Allow" {
+					isPublic["Effect"] = true
+				}
+				//Action
+				if len(element.Actions) > 0 {
 					isPublic["Action"] = true
 				}
-			} else if actionType == "map" {
-				if len(b.Action.(map[string]interface{})) > 0 {
-					isPublic["Action"] = true
-				}
-			}
-			if b.Effect == "Allow" {
-				isPublic["Effect"] = true
-			}
-			if principalType == "string" {
-				if b.Principal.(string) == "*" {
+				//Principal
+				if element.Principal.Wildcard != "" && element.Principal.Wildcard == "*" {
 					isPublic["Principal"] = true
-				}
-			} else if principalType == "map" {
-
-				pri := b.Principal.(map[string]interface{})
-				if len(b.Principal.(map[string]interface{})) > 0 && pri["AWS"] == "*" {
-					isPublic["Principal"] = true
+				} else if len(element.Principal.Map) > 0 {
+					for _, array := range element.Principal.Map {
+						for _, principal := range array {
+							if principal == "*" {
+								isPublic["Principal"] = true
+							}
+						}
+					}
 				}
 			}
-		}
-		counter := 0
-		for _, value := range isPublic {
-			if value == true {
-				counter++
+			counter := 0
+			for _, value := range isPublic {
+				if value == true {
+					counter++
+				}
 			}
-		}
-		if counter == 3 {
-			return true
+			if counter == 3 {
+				return true
+			}
 		}
 	}
 	return false
 }
 
-func checkType(i interface{}) string {
-	switch v := i.(type) {
-	case string:
-		return "string"
-	case map[string]interface{}:
-		return "map"
-	default:
-		fmt.Printf("I don't know about type %T\n", v)
-		return ""
-	}
-}
 func (s3brs *S3BucketReports) GenerateReport(r *S3ReportRequiredResources) {
 
 	for _, s3Bucket := range *r.S3Buckets {
