@@ -19,6 +19,7 @@ type S3Bucket struct {
 	Region   *string
 	*s3.ServerSideEncryptionConfiguration
 	*s3.LoggingEnabled
+	ACL s3.GetBucketAclOutput
 }
 
 type S3Buckets []*S3Bucket
@@ -207,7 +208,7 @@ func (b *S3Buckets) LoadFromAWS(sess *session.Session, config *configuration.Con
 	}
 
 	var wg sync.WaitGroup
-	n := 3 * len(*b)
+	n := 4 * len(*b)
 	done := make(chan bool, n)
 	errs := make(chan error, n)
 	wg.Add(n)
@@ -223,6 +224,8 @@ func (b *S3Buckets) LoadFromAWS(sess *session.Session, config *configuration.Con
 		go getPolicy(s3Bucket, regionS3API, done, errs, &wg)
 		go getEncryption(s3Bucket, regionS3API, done, errs, &wg)
 		go getBucketLogging(s3Bucket, regionS3API, done, errs, &wg)
+		go getACL(s3Bucket, regionS3API, done, errs, &wg)
+
 	}
 	for i := 0; i < n; i++ {
 		select {
@@ -254,11 +257,42 @@ func getPolicy(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errc chan error
 		return
 	}
 	if result.Policy != nil {
-		s3Bucket.S3Policy, err = NewS3Policy(*result.Policy)
+/*		s3Bucket.S3Policy, err = NewS3Policy(*result.Policy)
 		if err != nil {
 			errc <- fmt.Errorf("[ERROR] Bucket: %s Error Msg: %s", *s3Bucket.Name, err.Error())
 			return
 		}
+*/
+		bucketPolicy, conversionError := convertJSONtoStruct(result.Policy)
+		if conversionError != nil {
+			errc <- fmt.Errorf("[ERROR] %s: %s", *s3Bucket.Name, err.Error())
+		}
+		s3Bucket.S3Policy = bucketPolicy
+	}
+	done <- true
+}
+
+func getACL(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errs chan error, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	result, err := s3API.GetBucketAcl(&s3.GetBucketAclInput{
+		Bucket: s3Bucket.Name,
+	})
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case "NoSuchBucketACL":
+				done <- true
+			default:
+				errs <- fmt.Errorf("[AWS-ERROR] Bucket: %s  Error Msg: %s", *s3Bucket.Name, aerr.Error())
+			}
+		} else {
+			errs <- fmt.Errorf("[ERROR] %s: %s", *s3Bucket.Name, err.Error())
+		}
+		return
+	}
+	if result != nil {
+		s3Bucket.ACL = *result
 	}
 	done <- true
 }
@@ -296,4 +330,14 @@ func getBucketLogging(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errs cha
 	}
 	s3Bucket.LoggingEnabled = result.LoggingEnabled
 	done <- true
+}
+
+func convertJSONtoStruct(result *string) (bucketPolicy BucketPolicy, err error) {
+	policy := *result
+	err = json.Unmarshal([]byte(policy), &bucketPolicy)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return bucketPolicy, err
+
 }
