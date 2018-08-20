@@ -10,7 +10,6 @@ import (
 
 // var cfgFile string
 var config = configuration.GetConfig()
-var mylogger = config.Logger
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -20,7 +19,7 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		err := scanner.Run(&config)
 		if err != nil {
-			mylogger.Error(err.Error())
+			config.Logger.Error(err.Error())
 		}
 	},
 }
@@ -29,7 +28,7 @@ var rootCmd = &cobra.Command{
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		mylogger.Error(err.Error())
+		config.Logger.Error(err.Error())
 		os.Exit(1)
 	}
 }
