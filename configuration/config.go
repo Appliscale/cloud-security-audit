@@ -6,7 +6,7 @@ import (
 )
 
 type Config struct {
-	Region         string
+	Regions        *[]string
 	Service        string
 	Profile        string
 	SessionFactory *sessionfactory.SessionFactory

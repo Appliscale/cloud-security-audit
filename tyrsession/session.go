@@ -26,8 +26,8 @@ func CreateSession(config SessionConfig) (*session.Session, error) {
 }
 
 // GetAvailableRegions returns list of available regions.
-func GetAvailableRegions() []string {
-	return []string{
+func GetAvailableRegions() *[]string {
+	return &[]string{
 		"us-east-2",
 		"us-east-1",
 		"us-west-1",
