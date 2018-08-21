@@ -10,6 +10,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
+const action = "Action"
+const effect = "Effect"
+const principal = "Principal"
+
 type S3BucketReport struct {
 	Name string
 	EncryptionType
@@ -68,37 +72,38 @@ func isBucketACLPublic(s3Bucket *resource.S3Bucket) bool {
 	grants := s3Bucket.ACL.Grants
 	ownerID := s3Bucket.ACL.Owner.ID
 
-	var uriFlag bool
-	var permissionFlag bool
-
-	var uriGroups [2]string
-	uriGroups[0] = "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"
-	uriGroups[1] = "http://acs.amazonaws.com/groups/global/AllUsers"
-
-	var permissionsACL [5]string
-	permissionsACL[0] = "READ"
-	permissionsACL[1] = "WRITE"
-	permissionsACL[2] = "READ_ACP"
-	permissionsACL[3] = "WRITE_ACP"
-	permissionsACL[4] = "FULL_CONTROL"
+	var uriGroups = []string{
+		"http://acs.amazonaws.com/groups/global/AuthenticatedUsers",
+		"http://acs.amazonaws.com/groups/global/AllUsers",
+	}
+	var permissionsACL = []string{
+		"READ",
+		"WRITE",
+		"READ_ACP",
+		"WRITE_ACP",
+		"FULL_CONTROL",
+	}
 
 	for _, grant := range grants {
 		granteeURI := grant.Grantee.URI
 		granteePermission := grant.Permission
 		granteeID := grant.Grantee.ID
 		if granteeID != ownerID {
-			for _, group := range uriGroups {
-				if granteeURI != nil && *granteeURI == group {
-					uriFlag = true
-				}
-			}
-			for _, permission := range permissionsACL {
-				if granteePermission != nil && *granteePermission == permission {
-					permissionFlag = true
+			if granteeID != ownerID {
+				if (granteeURI != nil && isStringInArray(*granteeURI, uriGroups)) &&
+					(granteePermission != nil && isStringInArray(*granteePermission, permissionsACL)) {
+					return true
 				}
 			}
 		}
-		if uriFlag == true && permissionFlag == true {
+	}
+	return false
+
+}
+
+func isStringInArray(element string, array []string) bool {
+	for _, arrayElement := range array {
+		if arrayElement == element {
 			return true
 		}
 	}
@@ -111,42 +116,34 @@ func isBucketPolicyPublic(s3Bucket *resource.S3Bucket) bool {
 		bucketPolicy := s3Bucket.S3Policy
 		stat := bucketPolicy.Statements
 
-		if len(stat) > 0 {
-			for _, element := range stat {
-				isPublic["Effect"] = false
-				isPublic["Action"] = false
-				isPublic["Principal"] = false
+		for _, element := range stat {
+			isPublic[effect] = false
+			isPublic[action] = false
+			isPublic[principal] = false
 
-				//Effect
-				if element.Effect == "Allow" {
-					isPublic["Effect"] = true
-				}
-				//Action
-				if len(element.Actions) > 0 {
-					isPublic["Action"] = true
-				}
-				//Principal
-				if element.Principal.Wildcard != "" && element.Principal.Wildcard == "*" {
-					isPublic["Principal"] = true
-				} else if len(element.Principal.Map) > 0 {
-					for _, array := range element.Principal.Map {
-						for _, principal := range array {
-							if principal == "*" {
-								isPublic["Principal"] = true
-							}
+			//Effect
+			if element.Effect == "Allow" {
+				isPublic[effect] = true
+			}
+			//Action
+			if len(element.Actions) > 0 {
+				isPublic[action] = true
+			}
+			//Principal
+			if element.Principal.Wildcard != "" && element.Principal.Wildcard == "*" {
+				isPublic[principal] = true
+			} else if len(element.Principal.Map) > 0 {
+				for _, array := range element.Principal.Map {
+					for _, principal := range array {
+						if principal == "*" {
+							isPublic[principal] = true
 						}
 					}
 				}
 			}
-			counter := 0
-			for _, value := range isPublic {
-				if value == true {
-					counter++
-				}
-			}
-			if counter == 3 {
-				return true
-			}
+		}
+		if isPublic[action] && isPublic[effect] && isPublic[principal] {
+			return true
 		}
 	}
 	return false
