@@ -118,6 +118,7 @@ func (b *S3Buckets) LoadFromAWS(sess *session.Session, config *configuration.Con
 	}
 
 	var wg sync.WaitGroup
+	// For every S3Bucket b are running 4 functions  https://golang.org/pkg/sync/#WaitGroup
 	n := 4 * len(*b)
 	done := make(chan bool, n)
 	errs := make(chan error, n)
