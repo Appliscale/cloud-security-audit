@@ -2,11 +2,12 @@ package resource
 
 import (
 	"fmt"
-	"github.com/Appliscale/tyr/configuration"
 	"strings"
 	"sync"
 
-	"github.com/aws/aws-sdk-go/aws"
+	"github.com/Appliscale/tyr/configuration"
+	"github.com/Appliscale/tyr/tyrsession"
+
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
@@ -33,52 +34,12 @@ type KMSKeyAliases []*kms.AliasListEntry
 
 type KMSKeysListEntries []*kms.KeyListEntry
 
-func getRegionMapOfKMSAPIs(sess *session.Session, config *configuration.Config) (map[string]*kms.KMS, error) {
-	regions := []string{
-		"us-east-2",
-		"us-east-1",
-		"us-west-1",
-		"us-west-2",
-		"ap-northeast-1",
-		"ap-northeast-2",
-		"ap-northeast-3",
-		"ap-south-1",
-		"ap-southeast-1",
-		"ap-southeast-2",
-		"ca-central-1",
-		"eu-central-1",
-		"eu-west-1",
-		"eu-west-2",
-		"eu-west-3",
-		"sa-east-1",
-	}
-	regionSessions := make(map[string]*kms.KMS)
-	for _, region := range regions {
-		sess, err := session.NewSessionWithOptions(
-			session.Options{
-				Config: aws.Config{
-					Region: &region,
-				},
-				Profile: config.Profile,
-			},
-		)
-		if err == nil {
-			regionSessions[region] = kms.New(sess)
-		} else {
-			return nil, err
-		}
-	}
-	return regionSessions, nil
-}
-
 // LoadAllFromAWS : Load KMS Keys from all regions
 func (k *KMSKeys) LoadAllFromAWS(sess *session.Session, config *configuration.Config) error {
-	regionSessions, err := getRegionMapOfKMSAPIs(sess, config)
-	if err != nil {
-		return err
-	}
+	regions := tyrsession.GetAvailableRegions()
+
 	var wg sync.WaitGroup
-	n := len(regionSessions) * 2
+	n := len(regions) * 2
 	done := make(chan bool, n)
 	errc := make(chan error, n)
 	wg.Add(n)
@@ -91,9 +52,19 @@ func (k *KMSKeys) LoadAllFromAWS(sess *session.Session, config *configuration.Co
 
 	kmsKeyAliases := &KMSKeyAliases{}
 	kmsKeyListEntries := &KMSKeysListEntries{}
-	for _, kmsAPI := range regionSessions {
-		go loadKeyListEntries(kmsAPI, kmsKeyListEntries, done, errc, &wg)
-		go loadKeyAliases(kmsAPI, kmsKeyAliases, done, errc, &wg)
+	for _, region := range regions {
+
+		kmsClient, err := config.ClientFactory.GetKmsClient(
+			tyrsession.SessionConfig{
+				Profile: config.Profile,
+				Region:  region,
+			})
+		if err != nil {
+			return err
+		}
+
+		go loadKeyListEntries(kmsClient, kmsKeyListEntries, done, errc, &wg)
+		go loadKeyAliases(kmsClient, kmsKeyAliases, done, errc, &wg)
 	}
 	for i := 0; i < n; i++ {
 		select {
