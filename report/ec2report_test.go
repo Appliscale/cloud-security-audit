@@ -1,10 +1,11 @@
 package report
 
 import (
-	"github.com/Appliscale/tyr/resource"
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/Appliscale/tyr/resource"
 
 	"github.com/aws/aws-sdk-go/aws"
 

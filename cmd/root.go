@@ -1,9 +1,10 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/scanner"
-	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -34,7 +35,6 @@ func Execute() {
 }
 
 func init() {
-
 	rootCmd.Flags().StringVarP(&config.Region, "region", "r", "", "specify aws region to scan your account,e.g. --region us-east-1")
 	rootCmd.MarkFlagRequired("region")
 
@@ -42,7 +42,4 @@ func init() {
 	rootCmd.MarkFlagRequired("service")
 
 	rootCmd.Flags().StringVarP(&config.Profile, "profile", "p", "", "specify aws profile e.g. --profile appliscale")
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
