@@ -14,10 +14,6 @@ type SessionFactory struct {
 
 // New creates a new instance of the SessionFactory.
 func New() *SessionFactory {
-	return newFactory()
-}
-
-func newFactory() *SessionFactory {
 	factory := &SessionFactory{
 		regionToSession: make(map[string]*session.Session),
 	}
