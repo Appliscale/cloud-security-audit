@@ -2,7 +2,7 @@ package resource
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 )
 
 type S3Policy struct {
@@ -86,7 +86,8 @@ func (p *Principal) UnmarshalJSON(b []byte) error {
 					p.Map[key] = append(p.Map[key], elem.(string))
 				}
 			default:
-				fmt.Printf("type: %T\n", t)
+				return errors.New("Unsupported type " + t.(string))
+
 			}
 		}
 	}
