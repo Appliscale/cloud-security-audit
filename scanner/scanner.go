@@ -6,9 +6,7 @@ import (
 
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/report"
-
 	"github.com/aws/aws-sdk-go/aws"
-
 	"github.com/aws/aws-sdk-go/aws/session"
 )
 

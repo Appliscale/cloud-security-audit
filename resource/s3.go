@@ -165,7 +165,6 @@ func (b *S3Buckets) LoadNames(sess *session.Session) error {
 }
 
 func (b *S3Buckets) LoadFromAWS(sess *session.Session, config *configuration.Config) error {
-
 	err := b.LoadNames(sess)
 	if err != nil {
 		return err

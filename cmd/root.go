@@ -1,21 +1,16 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/scanner"
-	"github.com/Appliscale/tyr/tyrlogger"
-	"github.com/Appliscale/tyr/tyrsession/clientfactory"
-	"github.com/Appliscale/tyr/tyrsession/sessionfactory"
 
 	"github.com/spf13/cobra"
 )
 
 // var cfgFile string
-var config configuration.Config
-var logger = tyrlogger.GetInstance()
+var config = configuration.GetConfig()
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -25,7 +20,7 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		err := scanner.Run(&config)
 		if err != nil {
-			logger.Fatalln(err)
+			config.Logger.Error(err.Error())
 		}
 	},
 }
@@ -34,13 +29,12 @@ var rootCmd = &cobra.Command{
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		config.Logger.Error(err.Error())
 		os.Exit(1)
 	}
 }
 
 func init() {
-
 	rootCmd.Flags().StringVarP(&config.Region, "region", "r", "", "specify aws region to scan your account,e.g. --region us-east-1")
 	rootCmd.MarkFlagRequired("region")
 
@@ -48,9 +42,4 @@ func init() {
 	rootCmd.MarkFlagRequired("service")
 
 	rootCmd.Flags().StringVarP(&config.Profile, "profile", "p", "", "specify aws profile e.g. --profile appliscale")
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	config.SessionFactory = sessionfactory.New()
-	config.ClientFactory = clientfactory.New(config.SessionFactory)
 }
