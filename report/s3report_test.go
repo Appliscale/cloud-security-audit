@@ -3,11 +3,10 @@ package report
 import (
 	"fmt"
 	"github.com/Appliscale/tyr/resource"
-	"testing"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestS3Report_WhenSSEAlgorithmIsAES256CheckEncryptionTypeReturnsAES256(t *testing.T) {

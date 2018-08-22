@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/report"
-	"strings"
-
 	"github.com/aws/aws-sdk-go/aws"
-
 	"github.com/aws/aws-sdk-go/aws/session"
+	"strings"
 )
 
 func Run(config *configuration.Config) error {

@@ -3,7 +3,6 @@ package report
 import (
 	"bytes"
 	"github.com/Appliscale/tyr/resource"
-
 	"github.com/aws/aws-sdk-go/aws/session"
 )
 
