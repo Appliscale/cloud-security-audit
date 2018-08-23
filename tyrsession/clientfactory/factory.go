@@ -11,10 +11,6 @@ type ClientFactory struct {
 
 // New creates a new instance of the ClientFactory.
 func New(sessionFactory *sessionfactory.SessionFactory) *ClientFactory {
-	return newFactory(sessionFactory)
-}
-
-func newFactory(sessionFactory *sessionfactory.SessionFactory) *ClientFactory {
 	factory := &ClientFactory{
 		sessionFactory: sessionFactory,
 	}

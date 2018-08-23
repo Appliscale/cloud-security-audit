@@ -14,21 +14,14 @@ import (
 
 type S3Bucket struct {
 	*s3.Bucket
-	S3Policy S3Policy
+	S3Policy *S3Policy
 	Region   *string
 	*s3.ServerSideEncryptionConfiguration
 	*s3.LoggingEnabled
+	ACL s3.GetBucketAclOutput
 }
 
 type S3Buckets []*S3Bucket
-
-type S3Policy interface{}
-
-// type S3Policy struct {
-// 	Version   string //`json:",omitempty"`
-// 	Id        string //`json:",omitempty"`
-// 	Statement interface{}
-// }
 
 func (b *S3Buckets) LoadRegions(sess *session.Session) error {
 	sess.Handlers.Unmarshal.PushBackNamed(s3.NormalizeBucketLocationHandler)
@@ -83,7 +76,6 @@ func (b *S3Buckets) LoadNames(sess *session.Session) error {
 }
 
 func (b *S3Buckets) LoadFromAWS(sess *session.Session, config *configuration.Config) error {
-
 	err := b.LoadNames(sess)
 	if err != nil {
 		return err
@@ -95,7 +87,8 @@ func (b *S3Buckets) LoadFromAWS(sess *session.Session, config *configuration.Con
 	}
 
 	var wg sync.WaitGroup
-	n := 2 * len(*b)
+	// For every S3Bucket b are running 4 functions  https://golang.org/pkg/sync/#WaitGroup
+	n := 4 * len(*b)
 	done := make(chan bool, n)
 	errs := make(chan error, n)
 	wg.Add(n)
@@ -115,10 +108,11 @@ func (b *S3Buckets) LoadFromAWS(sess *session.Session, config *configuration.Con
 		if err != nil {
 			return err
 		}
-		// TODO : Need to add struct for s3 bucket policy
-		// go getPolicy(s3Bucket, s3Client, done, errs, &wg)
+
+		go getPolicy(s3Bucket, s3Client, done, errs, &wg)
 		go getEncryption(s3Bucket, s3Client, done, errs, &wg)
 		go getBucketLogging(s3Bucket, s3Client, done, errs, &wg)
+		go getACL(s3Bucket, s3Client, done, errs, &wg)
 	}
 	for i := 0; i < n; i++ {
 		select {
@@ -130,7 +124,7 @@ func (b *S3Buckets) LoadFromAWS(sess *session.Session, config *configuration.Con
 	return nil
 }
 
-func getPolicy(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errs chan error, wg *sync.WaitGroup) {
+func getPolicy(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errc chan error, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	result, err := s3API.GetBucketPolicy(&s3.GetBucketPolicyInput{
@@ -142,6 +136,35 @@ func getPolicy(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errs chan error
 			case "NoSuchBucketPolicy":
 				done <- true
 			default:
+				errc <- fmt.Errorf("[AWS-ERROR] Bucket: %s  Error Msg: %s", *s3Bucket.Name, aerr.Error())
+			}
+		} else {
+			errc <- fmt.Errorf("[ERROR] %s: %s", *s3Bucket.Name, err.Error())
+		}
+		return
+	}
+	if result.Policy != nil {
+		s3Bucket.S3Policy, err = NewS3Policy(*result.Policy)
+		if err != nil {
+			errc <- fmt.Errorf("[ERROR] Bucket: %s Error Msg: %s", *s3Bucket.Name, err.Error())
+			return
+		}
+	}
+	done <- true
+}
+
+func getACL(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errs chan error, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	result, err := s3API.GetBucketAcl(&s3.GetBucketAclInput{
+		Bucket: s3Bucket.Name,
+	})
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case "NoSuchBucketACL":
+				done <- true
+			default:
 				errs <- fmt.Errorf("[AWS-ERROR] Bucket: %s  Error Msg: %s", *s3Bucket.Name, aerr.Error())
 			}
 		} else {
@@ -149,8 +172,8 @@ func getPolicy(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errs chan error
 		}
 		return
 	}
-	if result.Policy != nil {
-		s3Bucket.S3Policy = *result.Policy
+	if result != nil {
+		s3Bucket.ACL = *result
 	}
 	done <- true
 }
