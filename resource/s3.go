@@ -112,7 +112,7 @@ func (b *S3Buckets) LoadFromAWS(sess *session.Session, config *configuration.Con
 		go getPolicy(s3Bucket, s3Client, done, errs, &wg)
 		go getEncryption(s3Bucket, s3Client, done, errs, &wg)
 		go getBucketLogging(s3Bucket, s3Client, done, errs, &wg)
-    go getACL(s3Bucket, s3Client, done, errs, &wg)
+		go getACL(s3Bucket, s3Client, done, errs, &wg)
 	}
 	for i := 0; i < n; i++ {
 		select {

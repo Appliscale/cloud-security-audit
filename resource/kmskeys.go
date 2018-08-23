@@ -36,7 +36,7 @@ type KMSKeysListEntries []*kms.KeyListEntry
 
 // LoadAllFromAWS : Load KMS Keys from all regions
 func (k *KMSKeys) LoadAllFromAWS(sess *session.Session, config *configuration.Config) error {
-	regions := tyrsession.GetAvailableRegions()
+	regions := *tyrsession.GetAvailableRegions()
 
 	var wg sync.WaitGroup
 	n := len(regions) * 2

@@ -3,8 +3,9 @@ package report
 import (
 	"bytes"
 
+	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/resource"
-	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/Appliscale/tyr/tyrsession"
 )
 
 type Ec2Report struct {
@@ -88,24 +89,35 @@ func (e *Ec2Reports) GenerateReport(r *Ec2ReportRequiredResources) {
 }
 
 // GetResources : Initialize and loads required resources to create ec2 report
-func (e *Ec2Reports) GetResources(sess *session.Session) (*Ec2ReportRequiredResources, error) {
+func (e *Ec2Reports) GetResources(config *configuration.Config) (*Ec2ReportRequiredResources, error) {
 	resources := &Ec2ReportRequiredResources{
 		KMSKeys:        resource.NewKMSKeys(),
 		Ec2s:           &resource.Ec2s{},
 		Volumes:        &resource.Volumes{},
 		SecurityGroups: &resource.SecurityGroups{},
 	}
-	err := resource.LoadResources(
-		sess,
-		resources.Ec2s,
-		resources.KMSKeys,
-		resources.Volumes,
-		resources.SecurityGroups,
-	)
-	if err != nil {
-		return nil, err
-	}
 
+	for _, region := range *config.Regions {
+		sess, err := config.SessionFactory.GetSession(
+			tyrsession.SessionConfig{
+				Region:  region,
+				Profile: config.Profile,
+			})
+		if err != nil {
+			return nil, err
+		}
+
+		err = resource.LoadResources(
+			sess,
+			resources.Ec2s,
+			resources.KMSKeys,
+			resources.Volumes,
+			resources.SecurityGroups,
+		)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return resources, nil
 }
 
