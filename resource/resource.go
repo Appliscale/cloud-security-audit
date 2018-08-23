@@ -66,3 +66,10 @@ func LoadFromFile(r Resource, filename string) error {
 	}
 	return json.Unmarshal(bytes, r)
 }
+
+func GetAvailableServices() *[]string {
+	return &[]string{
+		"ec2",
+		"s3",
+	}
+}
