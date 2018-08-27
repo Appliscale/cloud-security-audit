@@ -52,18 +52,36 @@ func init() {
 	rootCmd.Flags().StringVarP(&profile, "profile", "p", "", "specify aws profile e.g. --profile appliscale")
 }
 
+func getRegions() *[]string {
+	if region != "" {
+		return &[]string{region}
+	}
+
+	return tyrsession.GetAvailableRegions()
+}
+
+func getServices() *[]string {
+	if service != "" {
+		return &[]string{service}
+	}
+
+	return resource.GetAvailableServices()
+}
+
+func getProfile() string {
+	if profile != "" {
+		return profile
+	}
+
+	if profile, ok := os.LookupEnv("AWS_PROFILE"); ok {
+		return profile
+	}
+
+	return "default"
+}
+
 func initConfig() {
-	if region == "" {
-		config.Regions = tyrsession.GetAvailableRegions()
-	} else {
-		config.Regions = &[]string{region}
-	}
-
-	if service == "" {
-		config.Services = resource.GetAvailableServices()
-	} else {
-		config.Services = &[]string{service}
-	}
-
-	config.Profile = profile
+	config.Regions = getRegions()
+	config.Services = getServices()
+	config.Profile = getProfile()
 }
