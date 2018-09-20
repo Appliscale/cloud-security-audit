@@ -5,7 +5,6 @@ import (
 
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/resource"
-	"github.com/Appliscale/tyr/tyrsession"
 )
 
 type Ec2Report struct {
@@ -98,17 +97,9 @@ func (e *Ec2Reports) GetResources(config *configuration.Config) (*Ec2ReportRequi
 	}
 
 	for _, region := range *config.Regions {
-		sess, err := config.SessionFactory.GetSession(
-			tyrsession.SessionConfig{
-				Region:  region,
-				Profile: config.Profile,
-			})
-		if err != nil {
-			return nil, err
-		}
-
-		err = resource.LoadResources(
-			sess,
+		err := resource.LoadResources(
+			config,
+			region,
 			resources.Ec2s,
 			resources.KMSKeys,
 			resources.Volumes,

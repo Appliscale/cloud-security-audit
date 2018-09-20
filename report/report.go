@@ -1,9 +1,8 @@
 package report
 
 import (
-	"os"
-
 	"github.com/olekukonko/tablewriter"
+	"os"
 )
 
 type Report interface {
