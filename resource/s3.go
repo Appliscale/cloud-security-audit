@@ -66,7 +66,9 @@ func (b *S3Buckets) LoadRegions(config *configuration.Config, region string) err
 		}
 	}
 
+	config.SessionFactory.NewSession(sessionConfig)
 	return nil
+
 }
 
 // LoadNames : Get All S3 Bucket names

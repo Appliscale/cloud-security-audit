@@ -15,11 +15,11 @@ func (factory *SessionFactory) GetSession(config tyrsession.SessionConfig) (*ses
 		return sess, nil
 	}
 
-	return factory.newSession(config)
+	return factory.NewSession(config)
 }
 
-// newSession creates a new session and caches it.
-func (factory *SessionFactory) newSession(config tyrsession.SessionConfig) (*session.Session, error) {
+// NewSession creates a new session and caches it.
+func (factory *SessionFactory) NewSession(config tyrsession.SessionConfig) (*session.Session, error) {
 	sess, err := tyrsession.CreateSession(config)
 	if err != nil {
 		return nil, err
