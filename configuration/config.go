@@ -11,7 +11,7 @@ type Config struct {
 	Services       *[]string
 	Profile        string
 	SessionFactory *sessionfactory.SessionFactory
-	ClientFactory  *clientfactory.ClientFactory
+	ClientFactory  clientfactory.ClientFactory
 	Logger         *logger.Logger
 }
 

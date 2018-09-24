@@ -178,15 +178,6 @@ func (s3brs *S3BucketReports) GetResources(config *configuration.Config) (*S3Rep
 		S3Buckets: &resource.S3Buckets{},
 	}
 
-	//sess, err := tyrsession.CreateSession(
-	//	tyrsession.SessionConfig{
-	//		Region:  (*config.Regions)[0],
-	//		Profile: config.Profile,
-	//	})
-	//if err != nil {
-	//	return nil, err
-	//}
-
 	err := resources.S3Buckets.LoadFromAWS(config, (*config.Regions)[0])
 	if err != nil {
 		return nil, err

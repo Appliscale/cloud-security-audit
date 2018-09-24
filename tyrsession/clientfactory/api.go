@@ -8,14 +8,14 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-type AWSApi interface {
-	GetKmsClient(config tyrsession.SessionConfig) (*KmsClient, error)
-	GetEc2Client(config tyrsession.SessionConfig) (*EC2Client, error)
-	GetS3Client(config tyrsession.SessionConfig) (*S3Client, error)
+type ClientFactory interface {
+	GetKmsClient(config tyrsession.SessionConfig) (KmsClient, error)
+	GetEc2Client(config tyrsession.SessionConfig) (EC2Client, error)
+	GetS3Client(config tyrsession.SessionConfig) (S3Client, error)
 }
 
 // GetKmsClient creates a new KMS client from cached session.
-func (factory *ClientFactory) GetKmsClient(config tyrsession.SessionConfig) (KmsClient, error) {
+func (factory *ClientFactoryAWS) GetKmsClient(config tyrsession.SessionConfig) (KmsClient, error) {
 	sess, err := factory.sessionFactory.GetSession(config)
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func (factory *ClientFactory) GetKmsClient(config tyrsession.SessionConfig) (Kms
 }
 
 // GetEc2Client creates a new EC2 client from cached session.
-func (factory *ClientFactory) GetEc2Client(config tyrsession.SessionConfig) (EC2Client, error) {
+func (factory *ClientFactoryAWS) GetEc2Client(config tyrsession.SessionConfig) (EC2Client, error) {
 	sess, err := factory.sessionFactory.GetSession(config)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (factory *ClientFactory) GetEc2Client(config tyrsession.SessionConfig) (EC2
 }
 
 // GetS3Client creates a new S3 client from cached session.
-func (factory *ClientFactory) GetS3Client(config tyrsession.SessionConfig) (S3Client, error) {
+func (factory *ClientFactoryAWS) GetS3Client(config tyrsession.SessionConfig) (S3Client, error) {
 	sess, err := factory.sessionFactory.GetSession(config)
 	if err != nil {
 		return nil, err
