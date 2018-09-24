@@ -1,23 +1,23 @@
 package resource
 
-//
-//import (
-//	"errors"
-//	"testing"
-//
-//	"github.com/aws/aws-sdk-go/aws/session"
-//)
-//
-//type MockResource struct {
-//	DummyProperty string
-//}
-//
-//func (m *MockResource) LoadFromAWS(sess *session.Session) error {
-//	//return errors.New("Dummy error")
-//}
-//
-//func TestResourcesReturnsErrorFromLoadFromAWSFunc(t *testing.T) {
-//	//sess := &session.Session{}
-//	//mockResource := &MockResource{}
-//	//assert.Error(t, LoadResources(sess, mockResource))
-//}
+import (
+	"testing"
+
+	"errors"
+	"github.com/Appliscale/tyr/configuration"
+	"github.com/stretchr/testify/assert"
+)
+
+type MockResource struct {
+	DummyProperty string
+}
+
+func (m *MockResource) LoadFromAWS(config *configuration.Config, region string) error {
+	return errors.New("Dummy error")
+}
+
+func TestResourcesReturnsErrorFromLoadFromAWSFunc(t *testing.T) {
+	mockResource := &MockResource{}
+	config := configuration.GetTestConfig(t)
+	assert.Error(t, LoadResources(&config, "region", mockResource))
+}

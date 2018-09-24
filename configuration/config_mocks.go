@@ -10,7 +10,6 @@ import (
 func GetTestConfig(t *testing.T) (config Config) {
 	myLogger := logger.CreateQuietLogger()
 	config.Logger = &myLogger
-	//config.SessionFactory =
 	clientFactory := mocks.NewClientFactoryMock(t)
 	config.ClientFactory = &clientFactory
 	config.SessionFactory = sessionfactory.New()
