@@ -3,6 +3,7 @@ package resource
 import (
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/tyrsession"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
@@ -18,7 +19,17 @@ func (e *Ec2s) LoadFromAWS(config *configuration.Config, region string) error {
 	for {
 		result, err := ec2API.DescribeInstances(q)
 		if err != nil {
-			return err
+			if aerr, ok := err.(awserr.Error); ok {
+				switch aerr.Code() {
+				case "OptInRequired":
+					config.Logger.Warning("you are not subscribed to the EC2 service in region: " + region)
+					break
+				default:
+					return err
+				}
+			} else {
+				return err
+			}
 		}
 		for _, reservation := range result.Reservations {
 			*e = append(*e, reservation.Instances...)

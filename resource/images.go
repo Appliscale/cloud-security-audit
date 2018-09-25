@@ -6,6 +6,7 @@ import (
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/tyrsession"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
@@ -43,7 +44,16 @@ func (im *Images) LoadFromAWS(config *configuration.Config, region string) error
 		Owners: []*string{aws.String("self")},
 	})
 	if err != nil {
-		return err
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case "OptInRequired":
+				break
+			default:
+				return err
+			}
+		} else {
+			return err
+		}
 	}
 	*im = result.Images
 	return err
