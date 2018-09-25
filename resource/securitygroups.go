@@ -3,6 +3,7 @@ package resource
 import (
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/tyrsession"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
@@ -20,7 +21,16 @@ func (s *SecurityGroups) LoadFromAWS(config *configuration.Config, region string
 	for {
 		result, err := ec2API.DescribeSecurityGroups(q)
 		if err != nil {
-			return err
+			if aerr, ok := err.(awserr.Error); ok {
+				switch aerr.Code() {
+				case "OptInRequired":
+					break
+				default:
+					return err
+				}
+			} else {
+				return err
+			}
 		}
 		for _, sg := range result.SecurityGroups {
 			(*s)[*sg.GroupId] = append((*s)[*sg.GroupId], sg.IpPermissions...)

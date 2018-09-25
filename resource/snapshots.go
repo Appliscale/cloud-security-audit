@@ -4,6 +4,7 @@ import (
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/tyrsession"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
@@ -20,7 +21,16 @@ func (s *Snapshots) LoadFromAWS(config *configuration.Config, region string) err
 	for {
 		result, err := ec2API.DescribeSnapshots(q)
 		if err != nil {
-			return err
+			if aerr, ok := err.(awserr.Error); ok {
+				switch aerr.Code() {
+				case "OptInRequired":
+					break
+				default:
+					return err
+				}
+			} else {
+				return err
+			}
 		}
 		*s = append(*s, result.Snapshots...)
 		if result.NextToken == nil {

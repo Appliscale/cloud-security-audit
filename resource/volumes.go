@@ -3,6 +3,7 @@ package resource
 import (
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/tyrsession"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
@@ -17,7 +18,16 @@ func (v *Volumes) LoadFromAWS(config *configuration.Config, region string) error
 	for {
 		result, err := ec2API.DescribeVolumes(q)
 		if err != nil {
-			return err
+			if aerr, ok := err.(awserr.Error); ok {
+				switch aerr.Code() {
+				case "OptInRequired":
+					break
+				default:
+					return err
+				}
+			} else {
+				return err
+			}
 		}
 		*v = append(*v, result.Volumes...)
 		if result.NextToken == nil {
