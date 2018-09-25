@@ -5,15 +5,15 @@ import (
 	"io/ioutil"
 	"sync"
 
-	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/Appliscale/tyr/configuration"
 )
 
 type Resource interface {
-	LoadFromAWS(sess *session.Session) error
+	LoadFromAWS(config *configuration.Config, region string) error
 }
 
-func LoadResource(r Resource, sess *session.Session) error {
-	err := r.LoadFromAWS(sess)
+func LoadResource(r Resource, config *configuration.Config, region string) error {
+	err := r.LoadFromAWS(config, region)
 	if err != nil {
 		return err
 	}
@@ -21,7 +21,7 @@ func LoadResource(r Resource, sess *session.Session) error {
 	return nil
 }
 
-func LoadResources(sess *session.Session, resources ...Resource) error {
+func LoadResources(config *configuration.Config, region string, resources ...Resource) error {
 
 	var wg sync.WaitGroup
 	n := len(resources)
@@ -36,7 +36,7 @@ func LoadResources(sess *session.Session, resources ...Resource) error {
 	for _, r := range resources {
 		go func(r Resource) {
 			defer wg.Done()
-			errs <- r.LoadFromAWS(sess)
+			errs <- r.LoadFromAWS(config, region)
 		}(r)
 	}
 

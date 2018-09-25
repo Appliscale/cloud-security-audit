@@ -8,8 +8,8 @@ import (
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/tyrsession"
 
+	"github.com/Appliscale/tyr/tyrsession/clientfactory"
 	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
 )
 
@@ -35,7 +35,7 @@ type KMSKeyAliases []*kms.AliasListEntry
 type KMSKeysListEntries []*kms.KeyListEntry
 
 // LoadAllFromAWS : Load KMS Keys from all regions
-func (k *KMSKeys) LoadAllFromAWS(sess *session.Session, config *configuration.Config) error {
+func (k *KMSKeys) LoadAllFromAWS(config *configuration.Config) error {
 	regions := *tyrsession.GetAvailableRegions()
 
 	var wg sync.WaitGroup
@@ -53,12 +53,7 @@ func (k *KMSKeys) LoadAllFromAWS(sess *session.Session, config *configuration.Co
 	kmsKeyAliases := &KMSKeyAliases{}
 	kmsKeyListEntries := &KMSKeysListEntries{}
 	for _, region := range regions {
-
-		kmsClient, err := config.ClientFactory.GetKmsClient(
-			tyrsession.SessionConfig{
-				Profile: config.Profile,
-				Region:  region,
-			})
+		kmsClient, err := config.ClientFactory.GetKmsClient(tyrsession.SessionConfig{Profile: config.Profile, Region: region})
 		if err != nil {
 			return err
 		}
@@ -79,7 +74,7 @@ func (k *KMSKeys) LoadAllFromAWS(sess *session.Session, config *configuration.Co
 	return nil
 }
 
-func loadKeyListEntries(kmsAPI *kms.KMS, keyListEntries *KMSKeysListEntries, done chan bool, errc chan error, wg *sync.WaitGroup) {
+func loadKeyListEntries(kmsAPI clientfactory.KmsClient, keyListEntries *KMSKeysListEntries, done chan bool, errc chan error, wg *sync.WaitGroup) {
 	defer wg.Done()
 	q := &kms.ListKeysInput{}
 	for {
@@ -111,7 +106,7 @@ func loadKeyListEntries(kmsAPI *kms.KMS, keyListEntries *KMSKeysListEntries, don
 	}
 }
 
-func loadKeyAliases(kmsAPI *kms.KMS, aliases *KMSKeyAliases, done chan bool, errc chan error, wg *sync.WaitGroup) {
+func loadKeyAliases(kmsAPI clientfactory.KmsClient, aliases *KMSKeyAliases, done chan bool, errc chan error, wg *sync.WaitGroup) {
 	defer wg.Done()
 	listAliasesInput := &kms.ListAliasesInput{}
 	for {
@@ -139,8 +134,11 @@ func loadKeyAliases(kmsAPI *kms.KMS, aliases *KMSKeyAliases, done chan bool, err
 	}
 }
 
-func (k *KMSKeys) LoadFromAWS(sess *session.Session) error {
-	kmsAPI := kms.New(sess)
+func (k *KMSKeys) LoadFromAWS(config *configuration.Config, region string) error {
+	kmsAPI, err := config.ClientFactory.GetKmsClient(tyrsession.SessionConfig{Profile: config.Profile, Region: region})
+	if err != nil {
+		return err
+	}
 
 	var wg sync.WaitGroup
 	n := 2

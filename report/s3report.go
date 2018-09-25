@@ -5,8 +5,6 @@ import (
 
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/resource"
-	"github.com/Appliscale/tyr/tyrsession"
-
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
@@ -180,20 +178,11 @@ func (s3brs *S3BucketReports) GetResources(config *configuration.Config) (*S3Rep
 		S3Buckets: &resource.S3Buckets{},
 	}
 
-	sess, err := tyrsession.CreateSession(
-		tyrsession.SessionConfig{
-			Region:  (*config.Regions)[0],
-			Profile: config.Profile,
-		})
+	err := resources.S3Buckets.LoadFromAWS(config, (*config.Regions)[0])
 	if err != nil {
 		return nil, err
 	}
-
-	err = resources.S3Buckets.LoadFromAWS(sess, config)
-	if err != nil {
-		return nil, err
-	}
-	err = resources.KMSKeys.LoadAllFromAWS(sess, config)
+	err = resources.KMSKeys.LoadAllFromAWS(config)
 	if err != nil {
 		return nil, err
 	}

@@ -7,8 +7,8 @@ import (
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/tyrsession"
 
+	"github.com/Appliscale/tyr/tyrsession/clientfactory"
 	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
@@ -23,9 +23,17 @@ type S3Bucket struct {
 
 type S3Buckets []*S3Bucket
 
-func (b *S3Buckets) LoadRegions(sess *session.Session) error {
+func (b *S3Buckets) LoadRegions(config *configuration.Config, region string) error {
+	sessionConfig := tyrsession.SessionConfig{Profile: config.Profile, Region: region}
+	sess, err := config.SessionFactory.GetSession(sessionConfig)
+	if err != nil {
+		return err
+	}
 	sess.Handlers.Unmarshal.PushBackNamed(s3.NormalizeBucketLocationHandler)
-	s3API := s3.New(sess)
+	s3API, err := config.ClientFactory.GetS3Client(sessionConfig)
+	if err != nil {
+		return err
+	}
 
 	wg := sync.WaitGroup{}
 	n := len(*b)
@@ -58,12 +66,17 @@ func (b *S3Buckets) LoadRegions(sess *session.Session) error {
 		}
 	}
 
+	config.SessionFactory.NewSession(sessionConfig)
 	return nil
+
 }
 
 // LoadNames : Get All S3 Bucket names
-func (b *S3Buckets) LoadNames(sess *session.Session) error {
-	s3API := s3.New(sess)
+func (b *S3Buckets) LoadNames(config *configuration.Config, region string) error {
+	s3API, err := config.ClientFactory.GetS3Client(tyrsession.SessionConfig{Profile: config.Profile, Region: region})
+	if err != nil {
+		return err
+	}
 
 	result, err := s3API.ListBuckets(&s3.ListBucketsInput{})
 	if err != nil {
@@ -75,13 +88,13 @@ func (b *S3Buckets) LoadNames(sess *session.Session) error {
 	return nil
 }
 
-func (b *S3Buckets) LoadFromAWS(sess *session.Session, config *configuration.Config) error {
-	err := b.LoadNames(sess)
+func (b *S3Buckets) LoadFromAWS(config *configuration.Config, region string) error {
+	err := b.LoadNames(config, region)
 	if err != nil {
 		return err
 	}
 
-	err = b.LoadRegions(sess)
+	err = b.LoadRegions(config, region)
 	if err != nil {
 		return err
 	}
@@ -124,7 +137,7 @@ func (b *S3Buckets) LoadFromAWS(sess *session.Session, config *configuration.Con
 	return nil
 }
 
-func getPolicy(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errc chan error, wg *sync.WaitGroup) {
+func getPolicy(s3Bucket *S3Bucket, s3API clientfactory.S3Client, done chan bool, errc chan error, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	result, err := s3API.GetBucketPolicy(&s3.GetBucketPolicyInput{
@@ -153,7 +166,7 @@ func getPolicy(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errc chan error
 	done <- true
 }
 
-func getACL(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errs chan error, wg *sync.WaitGroup) {
+func getACL(s3Bucket *S3Bucket, s3API clientfactory.S3Client, done chan bool, errs chan error, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	result, err := s3API.GetBucketAcl(&s3.GetBucketAclInput{
@@ -178,7 +191,7 @@ func getACL(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errs chan error, w
 	done <- true
 }
 
-func getEncryption(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errs chan error, wg *sync.WaitGroup) {
+func getEncryption(s3Bucket *S3Bucket, s3API clientfactory.S3Client, done chan bool, errs chan error, wg *sync.WaitGroup) {
 	defer wg.Done()
 	result, err := s3API.GetBucketEncryption(&s3.GetBucketEncryptionInput{Bucket: s3Bucket.Name})
 
@@ -202,7 +215,7 @@ func getEncryption(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errs chan e
 	done <- true
 }
 
-func getBucketLogging(s3Bucket *S3Bucket, s3API *s3.S3, done chan bool, errs chan error, wg *sync.WaitGroup) {
+func getBucketLogging(s3Bucket *S3Bucket, s3API clientfactory.S3Client, done chan bool, errs chan error, wg *sync.WaitGroup) {
 	defer wg.Done()
 	result, err := s3API.GetBucketLogging(&s3.GetBucketLoggingInput{Bucket: s3Bucket.Name})
 	if err != nil {

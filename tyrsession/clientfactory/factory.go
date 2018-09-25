@@ -5,13 +5,13 @@ import (
 )
 
 // ClientFactory provides methods for creation and management of service clients.
-type ClientFactory struct {
+type ClientFactoryAWS struct {
 	sessionFactory *sessionfactory.SessionFactory
 }
 
 // New creates a new instance of the ClientFactory.
-func New(sessionFactory *sessionfactory.SessionFactory) *ClientFactory {
-	factory := &ClientFactory{
+func New(sessionFactory *sessionfactory.SessionFactory) ClientFactory {
+	factory := &ClientFactoryAWS{
 		sessionFactory: sessionFactory,
 	}
 

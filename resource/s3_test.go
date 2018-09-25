@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/Appliscale/tyr/configuration"
+	"github.com/Appliscale/tyr/tyrsession"
+	"github.com/Appliscale/tyr/tyrsession/clientfactory/mocks"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -53,4 +57,20 @@ func TestS3_PrincipalUnmarshalJSONAssignWildcardIfJsonPropertyIsString(t *testin
 	assert.Nilf(t, err, "This should not return error")
 	fmt.Printf("\n%v\n", principal)
 	assert.Equal(t, "*", principal.Wildcard)
+}
+
+func TestS3Buckets_LoadNames(t *testing.T) {
+	config := configuration.GetTestConfig(t)
+	defer config.ClientFactory.(*mocks.ClientFactoryMock).Destroy()
+
+	ec2Client, _ := config.ClientFactory.GetS3Client(tyrsession.SessionConfig{})
+	ec2Client.(*mocks.MockS3Client).
+		EXPECT().
+		ListBuckets(&s3.ListBucketsInput{}).
+		Times(1).
+		Return(&s3.ListBucketsOutput{}, nil)
+
+	s3Bucket := &S3Buckets{}
+	s3Bucket.LoadNames(&config, "region")
+
 }

@@ -1,15 +1,19 @@
 package resource
 
 import (
-	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/Appliscale/tyr/configuration"
+	"github.com/Appliscale/tyr/tyrsession"
 	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
 type SecurityGroups map[string][]*ec2.IpPermission
 
-func (s *SecurityGroups) LoadFromAWS(sess *session.Session) error {
+func (s *SecurityGroups) LoadFromAWS(config *configuration.Config, region string) error {
 
-	ec2API := ec2.New(sess)
+	ec2API, err := config.ClientFactory.GetEc2Client(tyrsession.SessionConfig{Profile: config.Profile, Region: region})
+	if err != nil {
+		return err
+	}
 
 	q := &ec2.DescribeSecurityGroupsInput{}
 
