@@ -25,11 +25,12 @@ type S3Buckets []*S3Bucket
 
 func (b *S3Buckets) LoadRegions(config *configuration.Config, region string) error {
 	sessionConfig := tyrsession.SessionConfig{Profile: config.Profile, Region: region}
-	sess, err := config.SessionFactory.GetSession(sessionConfig)
+	err := config.SessionFactory.SetNormalizeBucketLocation(sessionConfig)
 	if err != nil {
 		return err
 	}
-	sess.Handlers.Unmarshal.PushBackNamed(s3.NormalizeBucketLocationHandler)
+	defer config.SessionFactory.ReinitialiseSession(sessionConfig)
+
 	s3API, err := config.ClientFactory.GetS3Client(sessionConfig)
 	if err != nil {
 		return err
@@ -65,8 +66,6 @@ func (b *S3Buckets) LoadRegions(config *configuration.Config, region string) err
 			return err
 		}
 	}
-
-	config.SessionFactory.NewSession(sessionConfig)
 	return nil
 
 }
