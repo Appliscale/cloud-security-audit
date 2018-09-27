@@ -5,9 +5,10 @@ import (
 
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/resource"
-	"github.com/Appliscale/tyr/scanner"
 	"github.com/Appliscale/tyr/tyrsession"
 
+	"github.com/Appliscale/tyr/checkingrequiredfiles"
+	"github.com/Appliscale/tyr/scanner"
 	"github.com/spf13/cobra"
 )
 
@@ -20,9 +21,11 @@ var rootCmd = &cobra.Command{
 	Short: "Scan for vulnerabilities in your AWS Account.",
 	Long:  `Scan for vulnerabilities in your AWS Account.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		err := scanner.Run(&config)
-		if err != nil {
-			config.Logger.Error(err.Error())
+		if checkingrequiredfiles.CheckingRequiredFiles(&config) {
+			err := scanner.Run(&config)
+			if err != nil {
+				config.Logger.Error(err.Error())
+			}
 		}
 	},
 }
