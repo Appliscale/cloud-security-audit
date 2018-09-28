@@ -36,6 +36,14 @@ func (st *SortableTags) ToTableData() string {
 	}
 	var buffer bytes.Buffer
 	for _, key := range st.Keys[:n-1] {
+		maxWidth := 80
+		if len(st.Tags[key]+key) > maxWidth-1 {
+			i := maxWidth - 1 - len(key)
+			for i < len(st.Tags[key]) {
+				st.Tags[key] = st.Tags[key][:i] + "\n  " + st.Tags[key][i:]
+				i += maxWidth - 2
+			}
+		}
 		buffer.WriteString(key + ":" + st.Tags[key] + "\n")
 	}
 	buffer.WriteString(st.Keys[n-1] + ":" + st.Tags[st.Keys[n-1]])
