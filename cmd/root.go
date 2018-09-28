@@ -7,7 +7,7 @@ import (
 	"github.com/Appliscale/tyr/resource"
 	"github.com/Appliscale/tyr/tyrsession"
 
-	"github.com/Appliscale/tyr/checkingrequiredfiles"
+	"github.com/Appliscale/tyr/environment"
 	"github.com/Appliscale/tyr/scanner"
 	"github.com/spf13/cobra"
 )
@@ -21,7 +21,7 @@ var rootCmd = &cobra.Command{
 	Short: "Scan for vulnerabilities in your AWS Account.",
 	Long:  `Scan for vulnerabilities in your AWS Account.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if checkingrequiredfiles.CheckingRequiredFiles(&config) {
+		if environment.CheckAWSConfigFiles(&config) {
 			err := scanner.Run(&config)
 			if err != nil {
 				config.Logger.Error(err.Error())
