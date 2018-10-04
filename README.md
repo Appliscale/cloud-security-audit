@@ -7,20 +7,27 @@ Tyr is a command line tool that scans for vulnerabilities in your AWS Account. I
 identify unsecure parts of your infrastructure and prepare your AWS account for security audit.
 
 ## Installation
-TBD
+Currently Tyr does not support any package managers, but the work is in progress. 
+### Building from sources
+First of all you need to download Tyr to your GO workspace:
 
+```bash
+$GOPATH $ go get github.com/Appliscale/tyr
+$GOPATH $ cd tyr
+```
+
+Then build and install configuration for the application inside perun directory by executing:
+
+```bash
+tyr $ make all
+```
 
 ## Usage
 ### Initialising Session
-If you're using MFA you need to initialise your session with another program before using Tyr.
-MFA support is in progress, for now we recomend using
-[Perun](https://github.com/Appliscale/perun):
+If you're using MFA you need to tell Tyr to authenticate you before trying to connect by using flag `--mfa`. 
+Example:
 ```
-$ perun mfa
-```
-or aws-mfa:
-```bash
-$ aws-mfa --device [DEVICE_ARN] --duration 3600 --profile [PROFILE_NAME]
+$ tyr --service s3 --mfa --mfa-duration 3600
 ```
 
 ### EC2 Scan
