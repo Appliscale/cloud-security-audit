@@ -13,6 +13,8 @@ type Config struct {
 	SessionFactory *sessionfactory.SessionFactory
 	ClientFactory  clientfactory.ClientFactory
 	Logger         *logger.Logger
+	Mfa            bool
+	MfaDuration    int64
 }
 
 func GetConfig() (config Config) {

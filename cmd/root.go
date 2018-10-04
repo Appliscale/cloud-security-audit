@@ -40,9 +40,11 @@ func Execute() {
 }
 
 var (
-	region  string
-	service string
-	profile string
+	region      string
+	service     string
+	profile     string
+	mfa         bool
+	mfaDuration int64
 )
 
 func init() {
@@ -53,6 +55,9 @@ func init() {
 	rootCmd.Flags().StringVarP(&service, "service", "s", "", "specify aws service to scan in your account,e.g. --service [ec2:x,ec2:image]")
 
 	rootCmd.Flags().StringVarP(&profile, "profile", "p", "", "specify aws profile e.g. --profile appliscale")
+
+	rootCmd.Flags().BoolVarP(&mfa, "mfa", "m", false, "indicates usage of Multi Factor Authentication")
+	rootCmd.Flags().Int64VarP(&mfaDuration, "mfa-duration", "d", 0, "sets the duration of the MFA session")
 }
 
 func getRegions() *[]string {
@@ -87,4 +92,7 @@ func initConfig() {
 	config.Regions = getRegions()
 	config.Services = getServices()
 	config.Profile = getProfile()
+	config.Mfa = mfa
+	config.MfaDuration = mfaDuration
+	configuration.InitialiseMFA(config)
 }
