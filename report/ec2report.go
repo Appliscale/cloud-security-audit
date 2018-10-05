@@ -5,6 +5,7 @@ import (
 
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/resource"
+	"strconv"
 )
 
 type Ec2Report struct {
@@ -32,7 +33,7 @@ type Ec2ReportRequiredResources struct {
 }
 
 func (e *Ec2Reports) GetHeaders() []string {
-	return []string{"EC2", "Volumes\n(None) - not encrypted\n(DKMS) - encrypted with default KMSKey", "Security\n Groups", "EC2 Tags"}
+	return []string{"EC2", "Volumes\n(None) - not encrypted\n(DKMS) - encrypted with default KMSKey", "Security\n Groups\n(Incoming CIDR = 0.0.0.0/0)\nID : PORT : PROTOCOL", "EC2 Tags"}
 }
 func (e *Ec2Reports) FormatDataToTable() [][]string {
 	data := [][]string{}
@@ -73,7 +74,7 @@ func (e *Ec2Reports) GenerateReport(r *Ec2ReportRequiredResources) {
 				for _, ipPermission := range ipPermissions {
 					for _, ipRange := range ipPermission.IpRanges {
 						if *ipRange.CidrIp == "0.0.0.0/0" {
-							ec2Report.SecurityGroupsIDs = append(ec2Report.SecurityGroupsIDs, *sg.GroupId)
+							ec2Report.SecurityGroupsIDs = append(ec2Report.SecurityGroupsIDs, *sg.GroupId+" : "+strconv.FormatInt(*ipPermission.ToPort, 10)+" : "+*ipPermission.IpProtocol)
 							ec2OK = false
 						}
 					}
