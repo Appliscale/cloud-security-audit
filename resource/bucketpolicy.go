@@ -23,9 +23,9 @@ func NewS3Policy(s string) (*S3Policy, error) {
 
 type Statement struct {
 	Effect    string
-	Principal Principal
-	Actions   Actions `json:"Action"`
-	Resource  Resources
+	Principal Principal `json:"Principal"`
+	Actions   Actions   `json:"Action"`
+	Resource  Resources `json:"Resource"`
 	Condition Condition `json:",omitempty"`
 }
 
@@ -97,7 +97,7 @@ func (p *Principal) UnmarshalJSON(b []byte) error {
 
 type Resources []string
 
-func (a *Resources) UnmarshalJSON(b []byte) error {
+func (r *Resources) UnmarshalJSON(b []byte) error {
 
 	array := []string{}
 	err := json.Unmarshal(b, &array)
@@ -111,11 +111,11 @@ func (a *Resources) UnmarshalJSON(b []byte) error {
 		if err != nil {
 			return err
 		}
-		*a = append(*a, s)
+		*r = append(*r, s)
 		return nil
 	}
-	for _, action := range array {
-		*a = append(*a, action)
+	for _, resource := range array {
+		*r = append(*r, resource)
 	}
 	return nil
 }
