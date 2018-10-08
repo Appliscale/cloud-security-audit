@@ -74,3 +74,33 @@ func TestS3Buckets_LoadNames(t *testing.T) {
 	s3Bucket.LoadNames(&config, "region")
 
 }
+
+func TestResourcesWithSlice(t *testing.T) {
+	b := []byte(`["arn:aws:s3:::examplebucket/*"]`)
+	resources := Resources{}
+	err := resources.UnmarshalJSON(b)
+	assert.Nilf(t, err, "UnmarshalJSON should not return error for array of actions.")
+}
+
+func TestResourcesWithTwoElements(t *testing.T) {
+	b := []byte(`["arn:aws:iam::111122223333:root","arn:aws:iam::444455556666:root"]`)
+	resources := Resources{}
+	err := resources.UnmarshalJSON(b)
+	assert.Nilf(t, err, "UnmarshalJSON should not return error for array of resources.")
+	assert.Equalf(t, 2, len(resources), "Resources should contain two elements.")
+}
+
+func TestResourcesWithOneElement(t *testing.T) {
+	b := []byte(`"s3:GetObject"`)
+	resources := Resources{}
+	err := resources.UnmarshalJSON(b)
+	assert.Nilf(t, err, "UnmarshalJSON should not return error for string in actions object.")
+	assert.Equalf(t, 1, len(resources), "Resources should contain one element.")
+}
+
+func TestResourcesWithMap(t *testing.T) {
+	b := []byte(`{"something":{"s3":"GetObject"}}`)
+	resources := Resources{}
+	err := resources.UnmarshalJSON(b)
+	assert.NotNilf(t, err, "UnmarshalJSON should return error for Json Map.")
+}
