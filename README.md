@@ -106,3 +106,15 @@ You can find more about securing your S3's in the following documentations:
  1. https://docs.aws.amazon.com/AmazonS3/latest/dev/serv-side-encryption.html
  2. https://docs.aws.amazon.com/AmazonS3/latest/dev/ServerLogs.html
  3. https://docs.aws.amazon.com/AmazonS3/latest/user-guide/server-access-logging.html
+ 
+## License
+
+[Apache License 2.0](LICENSE)
+
+## Maintainers
+
+- [Michał Połcik](https://github.com/mwpolcik)
+- [Maksymilian Wojczuk](https://github.com/maxiwoj)
+- [Piotr Figwer](https://github.com/pfigwer)
+- [Sylwia Gargula](https://github.com/SylwiaGargula)
+- [Mateusz Piwowarczyk](https://github.com/piwowarc)
