@@ -25,7 +25,7 @@ type Statement struct {
 	Effect    string
 	Principal Principal
 	Actions   Actions `json:"Action"`
-	Resource  string
+	Resource  Resources
 	Condition Condition `json:",omitempty"`
 }
 
@@ -92,5 +92,30 @@ func (p *Principal) UnmarshalJSON(b []byte) error {
 		}
 	}
 	p.Wildcard = s
+	return nil
+}
+
+type Resources []string
+
+func (a *Resources) UnmarshalJSON(b []byte) error {
+
+	array := []string{}
+	err := json.Unmarshal(b, &array)
+	/*
+		if error is: "json: cannot unmarshal string into Go value of type []string"
+		then fallback to unmarshaling string
+	*/
+	if err != nil {
+		s := ""
+		err = json.Unmarshal(b, &s)
+		if err != nil {
+			return err
+		}
+		*a = append(*a, s)
+		return nil
+	}
+	for _, action := range array {
+		*a = append(*a, action)
+	}
 	return nil
 }
