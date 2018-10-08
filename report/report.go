@@ -3,6 +3,7 @@ package report
 import (
 	"github.com/olekukonko/tablewriter"
 	"os"
+	"strings"
 )
 
 type Report interface {
@@ -17,7 +18,8 @@ func PrintTable(r Report) {
 	table := tablewriter.NewWriter(os.Stdout)
 	// Configure Headers
 	table.SetReflowDuringAutoWrap(false)
-	table.SetHeader(r.GetHeaders())
+	table.SetAutoFormatHeaders(false)
+	table.SetHeader(customFormatHeaders(r.GetHeaders()))
 	// Configure rows&cells
 	table.SetRowSeparator("-")
 	table.SetRowLine(true)
@@ -25,6 +27,26 @@ func PrintTable(r Report) {
 
 	table.AppendBulk(data)
 	table.Render()
+}
+
+func customFormatHeaders(headers []string) []string {
+	for i, header := range headers {
+		headers[i] = Title(header)
+	}
+	return headers
+}
+
+func Title(name string) string {
+	origLen := len(name)
+	name = strings.Replace(name, "_", " ", -1)
+	//name = strings.Replace(name, ".", " ", -1)
+	name = strings.TrimSpace(name)
+	if len(name) == 0 && origLen > 0 {
+		// Keep at least one character. This is important to preserve
+		// empty lines in multi-line headers/footers.
+		name = " "
+	}
+	return strings.ToUpper(name)
 }
 
 type EncryptionType int

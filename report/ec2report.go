@@ -33,8 +33,9 @@ type Ec2ReportRequiredResources struct {
 }
 
 func (e *Ec2Reports) GetHeaders() []string {
-	return []string{"EC2", "Volumes\n(None) - not encrypted\n(DKMS) - encrypted with default KMSKey", "Security\n Groups\n(Incoming CIDR = 0.0.0.0/0)\nID : PORT : PROTOCOL", "EC2 Tags"}
+	return []string{"EC2", "Volumes\n(None) - not encrypted\n(DKMS) - encrypted with default KMSKey", "Security\nGroups\n(Incoming CIDR = 0\x2E0\x2E0\x2E0/0)\nID : PROTOCOL : PORT", "EC2 Tags"}
 }
+
 func (e *Ec2Reports) FormatDataToTable() [][]string {
 	data := [][]string{}
 
@@ -74,7 +75,7 @@ func (e *Ec2Reports) GenerateReport(r *Ec2ReportRequiredResources) {
 				for _, ipPermission := range ipPermissions {
 					for _, ipRange := range ipPermission.IpRanges {
 						if *ipRange.CidrIp == "0.0.0.0/0" {
-							ec2Report.SecurityGroupsIDs = append(ec2Report.SecurityGroupsIDs, *sg.GroupId+" : "+strconv.FormatInt(*ipPermission.ToPort, 10)+" : "+*ipPermission.IpProtocol)
+							ec2Report.SecurityGroupsIDs = append(ec2Report.SecurityGroupsIDs, *sg.GroupId+" : "+*ipPermission.IpProtocol+" : "+strconv.FormatInt(*ipPermission.ToPort, 10))
 							ec2OK = false
 						}
 					}
