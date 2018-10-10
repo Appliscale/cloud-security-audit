@@ -33,9 +33,10 @@ func TestEC2Report_IfVolumeEncryptedWithDefaultKMSLineHasSuffixDKMS(t *testing.T
 	kmsKeys := resource.NewKMSKeys()
 	kmsKeys.Values[kmsKeyArn] = &resource.KMSKey{Custom: false}
 	r := &Ec2ReportRequiredResources{
-		Ec2s:    &resource.Ec2s{instance},
-		Volumes: &resource.Volumes{volume},
-		KMSKeys: kmsKeys,
+		Ec2s:             &resource.Ec2s{instance},
+		Volumes:          &resource.Volumes{volume},
+		KMSKeys:          kmsKeys,
+		AvailabilityZone: "Zone",
 	}
 	ec2Reports := &Ec2Reports{}
 	ec2Reports.GenerateReport(r)
