@@ -99,7 +99,9 @@ Tyr supports AWS profiles - to specify profile use the flag `-p` or `--profile`.
    * `NONE` - Default SSE not enabled.
    * `DKMS` - Default SSE enabled, AWS KMS Key used to encryp data.
    * `AES256` - Default SSE enabled, [AES256](https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html).
- 3. Third column `LOGGING ENABLED` contains information if logging was enabled in given S3 bucket.  
+ 3. Third column `LOGGING ENABLED` contains information if logging was enabled in given S3 bucket. 
+ 4. Fourth column `ACL - IS PUBLIC` provides information if ACL (Access Control List) contains permissions, that make the bucket public (allow read/writes for anyone) - More information about ACLs [here](https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html)
+ 5. Fifth column `POLICY - IS PUBLIC` contains information if bucket's policy allows any action (read/write) for an anonymous user. More about bucket policies [here](https://docs.aws.amazon.com/AmazonS3/latest/dev/using-iam-policies.html)
 
 #### Docs
 You can find more about securing your S3's in the following documentations:
