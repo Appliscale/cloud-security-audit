@@ -19,7 +19,6 @@ func PrintTable(r Report) {
 	table.SetReflowDuringAutoWrap(false)
 	table.SetHeader(r.GetHeaders())
 	// Configure rows&cells
-	table.SetAutoMergeCells(true)
 	table.SetRowSeparator("-")
 	table.SetRowLine(true)
 	table.SetAutoWrapText(false)

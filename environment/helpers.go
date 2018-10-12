@@ -14,7 +14,7 @@ func GetUserHomeDir() (string, error) {
 	return path, nil
 }
 
-func uniqueNonEmptyElementsOf(s []string) []string {
+func UniqueNonEmptyElementsOf(s []string) []string {
 	unique := make(map[string]bool, len(s))
 	us := make([]string, len(unique))
 	for _, elem := range s {
