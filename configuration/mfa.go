@@ -74,12 +74,6 @@ func UpdateSessionToken(config Config, profile string, region string) error {
 				return sessionError
 			}
 
-			var tokenCode string
-			sessionError = config.Logger.GetInput("MFA token code", &tokenCode)
-			if sessionError != nil {
-				return sessionError
-			}
-
 			var duration int64
 			if config.MfaDuration == 0 {
 				sessionError = config.Logger.GetInput("Duration", &duration)
@@ -88,6 +82,12 @@ func UpdateSessionToken(config Config, profile string, region string) error {
 				}
 			} else {
 				duration = config.MfaDuration
+			}
+
+			var tokenCode string
+			sessionError = config.Logger.GetInput("MFA token code", &tokenCode)
+			if sessionError != nil {
+				return sessionError
 			}
 
 			stsSession := sts.New(currentSession)
