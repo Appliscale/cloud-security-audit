@@ -24,7 +24,6 @@ func PrintTable(r Report) {
 	table.SetRowSeparator("-")
 	table.SetRowLine(true)
 	table.SetAutoWrapText(false)
-
 	table.AppendBulk(data)
 	table.Render()
 }

@@ -29,13 +29,17 @@ func TestEC2Report_IfVolumeEncryptedWithDefaultKMSLineHasSuffixDKMS(t *testing.T
 	instance := &ec2.Instance{
 		InstanceId:          &volumeID,
 		BlockDeviceMappings: []*ec2.InstanceBlockDeviceMapping{instanceBlockDeviceMapping},
+		Placement: &ec2.Placement{
+			AvailabilityZone: aws.String("us-east-1a"),
+		},
 	}
 	kmsKeys := resource.NewKMSKeys()
 	kmsKeys.Values[kmsKeyArn] = &resource.KMSKey{Custom: false}
 	r := &Ec2ReportRequiredResources{
-		Ec2s:    &resource.Ec2s{instance},
-		Volumes: &resource.Volumes{volume},
-		KMSKeys: kmsKeys,
+		Ec2s:             &resource.Ec2s{instance},
+		Volumes:          &resource.Volumes{volume},
+		KMSKeys:          kmsKeys,
+		AvailabilityZone: "Zone",
 	}
 	ec2Reports := &Ec2Reports{}
 	ec2Reports.GenerateReport(r)
@@ -58,6 +62,9 @@ func TestEC2Report_IfVolumeNotEncryptedLineHasSuffixNone(t *testing.T) {
 	instance := &ec2.Instance{
 		InstanceId:          &volumeID,
 		BlockDeviceMappings: []*ec2.InstanceBlockDeviceMapping{instanceBlockDeviceMapping},
+		Placement: &ec2.Placement{
+			AvailabilityZone: aws.String("us-east-1a"),
+		},
 	}
 	r := &Ec2ReportRequiredResources{
 		Ec2s:    &resource.Ec2s{instance},
@@ -90,7 +97,7 @@ func TestEC2Report_IfTagsInTableDataAreFormattedCorrectly(t *testing.T) {
 	ec2Reports := Ec2Reports{ec2Report1}
 	tableData := ec2Reports.FormatDataToTable()
 
-	formattedTags := strings.Split(tableData[0][3], "\n")
+	formattedTags := strings.Split(tableData[0][4], "\n")
 	sort.Strings(formattedTags)
 
 	assert.True(t, len(formattedTags) == 2)

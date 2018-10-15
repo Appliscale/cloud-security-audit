@@ -53,7 +53,7 @@ func CreateAWSConfigFile(config *configuration.Config, profile string, region st
 }
 
 func createConfigProfileFromCredentials(homeDir string, config *configuration.Config, profile string) {
-	profilesInCredentials := uniqueNonEmptyElementsOf(getProfilesFromFile(config, homeDir+"/.aws/credentials"))
+	profilesInCredentials := UniqueNonEmptyElementsOf(getProfilesFromFile(config, homeDir+"/.aws/credentials"))
 	config.Logger.Always("Available profile names are: " + fmt.Sprint("[ "+strings.Join(profilesInCredentials, ", ")+" ]"))
 	config.Logger.GetInput("Profile", &profile)
 	for !helpers.SliceContains(profilesInCredentials, profile) {

@@ -2,10 +2,12 @@ package report
 
 import (
 	"bytes"
-
 	"github.com/Appliscale/tyr/configuration"
+	"github.com/Appliscale/tyr/environment"
 	"github.com/Appliscale/tyr/resource"
+	"sort"
 	"strconv"
+	"strings"
 )
 
 type Ec2Report struct {
@@ -13,6 +15,7 @@ type Ec2Report struct {
 	InstanceID        string
 	SortableTags      *SortableTags
 	SecurityGroupsIDs []string
+	AvailabilityZone  string
 }
 
 func NewEc2Report(instanceID string) *Ec2Report {
@@ -26,14 +29,15 @@ func NewEc2Report(instanceID string) *Ec2Report {
 type Ec2Reports []*Ec2Report
 
 type Ec2ReportRequiredResources struct {
-	Ec2s           *resource.Ec2s
-	KMSKeys        *resource.KMSKeys
-	Volumes        *resource.Volumes
-	SecurityGroups *resource.SecurityGroups
+	Ec2s             *resource.Ec2s
+	KMSKeys          *resource.KMSKeys
+	Volumes          *resource.Volumes
+	SecurityGroups   *resource.SecurityGroups
+	AvailabilityZone string
 }
 
 func (e *Ec2Reports) GetHeaders() []string {
-	return []string{"EC2", "Volumes\n(None) - not encrypted\n(DKMS) - encrypted with default KMSKey", "Security\nGroups\n(Incoming CIDR = 0\x2E0\x2E0\x2E0/0)\nID : PROTOCOL : PORT", "EC2 Tags"}
+	return []string{"Availability\nZone", "EC2", "Volumes\n(None) - not encrypted\n(DKMS) - encrypted with default KMSKey", "Security\n Groups", "EC2 Tags"}
 }
 
 func (e *Ec2Reports) FormatDataToTable() [][]string {
@@ -41,6 +45,7 @@ func (e *Ec2Reports) FormatDataToTable() [][]string {
 
 	for _, ec2Report := range *e {
 		row := []string{
+			ec2Report.AvailabilityZone,
 			ec2Report.InstanceID,
 			ec2Report.VolumeReport.ToTableData(),
 			SliceOfStringsToString(ec2Report.SecurityGroupsIDs),
@@ -48,7 +53,8 @@ func (e *Ec2Reports) FormatDataToTable() [][]string {
 		}
 		data = append(data, row)
 	}
-	return data
+	sortedData := sortTableData(data)
+	return sortedData
 }
 
 func (e *Ec2Reports) GenerateReport(r *Ec2ReportRequiredResources) {
@@ -86,16 +92,18 @@ func (e *Ec2Reports) GenerateReport(r *Ec2ReportRequiredResources) {
 			ec2Report.SortableTags.Add(ec2.Tags)
 			*e = append(*e, ec2Report)
 		}
+		ec2Report.AvailabilityZone = *ec2.Placement.AvailabilityZone
 	}
 }
 
 // GetResources : Initialize and loads required resources to create ec2 report
 func (e *Ec2Reports) GetResources(config *configuration.Config) (*Ec2ReportRequiredResources, error) {
 	resources := &Ec2ReportRequiredResources{
-		KMSKeys:        resource.NewKMSKeys(),
-		Ec2s:           &resource.Ec2s{},
-		Volumes:        &resource.Volumes{},
-		SecurityGroups: &resource.SecurityGroups{},
+		KMSKeys:          resource.NewKMSKeys(),
+		Ec2s:             &resource.Ec2s{},
+		Volumes:          &resource.Volumes{},
+		SecurityGroups:   &resource.SecurityGroups{},
+		AvailabilityZone: "zone",
 	}
 
 	for _, region := range *config.Regions {
@@ -125,4 +133,26 @@ func SliceOfStringsToString(slice []string) string {
 	}
 	buffer.WriteString(slice[n-1])
 	return buffer.String()
+}
+
+func sortTableData(data [][]string) [][]string {
+	if data[0][0] == "" {
+		return data
+	}
+	var regions []string
+	var sortedData [][]string
+	for _, regs := range data {
+		reg := regs[0][:len(regs[0])-1]
+		regions = append(regions, reg)
+	}
+	sort.Strings(regions)
+	uniqueregions := environment.UniqueNonEmptyElementsOf(regions)
+	for _, unique := range uniqueregions {
+		for _, b := range data {
+			if strings.Contains(b[0], unique) {
+				sortedData = append(sortedData, b)
+			}
+		}
+	}
+	return sortedData
 }
