@@ -37,7 +37,7 @@ type Ec2ReportRequiredResources struct {
 }
 
 func (e *Ec2Reports) GetHeaders() []string {
-	return []string{"Availability Zone", "EC2", "Volumes\n(None) - not encrypted\n(DKMS) - encrypted with default KMSKey", "Security\n Groups", "EC2 Tags"}
+	return []string{"Availability\nZone", "EC2", "Volumes\n(None) - not encrypted\n(DKMS) - encrypted with default KMSKey", "Security\n Groups", "EC2 Tags"}
 }
 
 func (e *Ec2Reports) FormatDataToTable() [][]string {
