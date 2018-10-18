@@ -42,29 +42,30 @@ to specify profile use the flag `-p` or `--profile`.
 #### Example output
 
 ```bash
-+---------------------+--------------------------------+-------------+----------+
-|         EC2         |            VOLUMES             |  SECURITY   |          |
-|                     |                                |             | EC2 TAGS |
-|                     |     (NONE) - NOT ENCRYPTED     |   GROUPS    |          |
-|                     |                                |             |          |
-|                     |    (DKMS) - ENCRYPTED WITH     |             |          |
-|                     |         DEFAULT KMSKEY         |             |          |
-+---------------------+--------------------------------+-------------+----------+
-| i-0fa455c90ace32283 | vol-0a8143f0b2e78424d[DKMS]    | sg-aaaaaaa  | App:some |
-|                     | vol-0c4bacc1704c98f56[NONE]    |             | Key:Val  |
-|                     |                                |             |          |
-|                     |                                |             |          |
-+---------------------+--------------------------------+-------------+----------+
+
++---------------+---------------------+--------------------------------+-----------------------------------+----------+
+| AVAILABILITY  |         EC2         |            VOLUMES             |             SECURITY              |          |
+|               |                     |                                |                                   | EC2 TAGS |
+|     ZONE      |                     |     (NONE) - NOT ENCRYPTED     |              GROUPS               |          |
+|               |                     |                                |                                   |          |
+|               |                     |    (DKMS) - ENCRYPTED WITH     |    (INCOMING CIDR = 0.0.0.0/0)    |          |
+|               |                     |         DEFAULT KMSKEY         |                                   |          |
+|               |                     |                                |       ID : PROTOCOL : PORT        |          |
++---------------+---------------------+--------------------------------+-----------------------------------+----------+
+| eu-central-1a | i-0fa345j6756nb3v23 | vol-0a81288qjd188424d[DKMS]    | sg-aaaaaaaa : tcp : 22            | App:some |
+|               |                     | vol-0c2834re8dfsd8sdf[NONE]    | sg-aaaaaaaa : tcp : 22            | Key:Val  |
++---------------+---------------------+--------------------------------+-----------------------------------+----------+
 ```
 
 #### How to read it
 
- 1. First column `EC2` contains instance ID.
- 2. Second column `Volumes` contains IDs of attached volumes(virtual disks) to given EC2. Suffixes meaning:
+ 1. First column `AVAILABILITY ZONE` contains information where the instance is placed
+ 2. Second column `EC2` contains instance ID.
+ 3. Third column `Volumes` contains IDs of attached volumes(virtual disks) to given EC2. Suffixes meaning:
     * `[NONE]` - Volume not encrypted.
     * `[DKMS]` - Volume encrypted using AWS Default KMS Key. More about KMS you can find [here](https://aws.amazon.com/kms/faqs/)
- 3. Third column `Security Groups` contains IDs of security groups that have too open permissions. e.g. CIDR block is equal to `0.0.0.0/0`(open to the whole world).
- 4. Fourth column `EC2 TAGS` contains tags of a given EC2 instance to help you identify purpose of this instance.
+ 4. Fourth column `Security Groups` contains IDs of security groups that have too open permissions. e.g. CIDR block is equal to `0.0.0.0/0`(open to the whole world).
+ 5. Fifth column `EC2 TAGS` contains tags of a given EC2 instance to help you identify purpose of this instance.
 
 #### Docs
 You can find more information about encryption in the following documentation:
