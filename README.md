@@ -81,15 +81,23 @@ Tyr supports AWS profiles - to specify profile use the flag `-p` or `--profile`.
 #### Example output
 
 ```bash
-+------------------------------+-------------+-----------------+
-|          BUCKET NAME         | DEFAULT SSE | LOGGING ENABLED |
-+------------------------------+-------------+-----------------+
-| bucket1                      | NONE        | true            |
-+------------------------------+-------------+-----------------+
-| bucket2                      | DKMS        | false           |
-+------------------------------+-------------+-----------------+
-| bucket3                      | AES256      | false           |
-+------------------------------+-------------+-----------------+
++------------------------------+---------+---------+-------------+------------+
+|          BUCKET NAME         | DEFAULT | LOGGING |     ACL     |  POLICY    |
+|                              |         |         |             |            |
+|                              |   SSE   | ENABLED |  IS PUBLIC  | IS PUBLIC  |
+|                              |         |         |             |            |
+|                              |         |         |  R - READ   |  R - READ  |
+|                              |         |         |             |            |
+|                              |         |         |  W - WRITE  | W - WRITE  |
+|                              |         |         |             |            |
+|                              |         |         | D - DELETE  | D - DELETE |
++------------------------------+---------+---------+-------------+------------+
+| bucket1                      | NONE    | true    | false       | false      |
++------------------------------+---------+---------+-------------+------------+
+| bucket2                      | DKMS    | false   | false       | true [R]   |
++------------------------------+---------+---------+-------------+------------+
+| bucket3                      | AES256  | false   | true [RWD]  | false      |
++--------------------------- --+---------+---------+-------------+------------+
 ```
 
 #### How to read it
@@ -97,12 +105,12 @@ Tyr supports AWS profiles - to specify profile use the flag `-p` or `--profile`.
  1. First column `BUCKET NAME` contains names of the s3 buckets.
  2. Second column `DEFAULT SSE` gives you information on which default type of server side encryption was used in your S3 bucket:
    * `NONE` - Default SSE not enabled.
-   * `DKMS` - Default SSE enabled, AWS KMS Key used to encryp data.
+   * `DKMS` - Default SSE enabled, AWS KMS Key used to encrypt data.
    * `AES256` - Default SSE enabled, [AES256](https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html).
  3. Third column `LOGGING ENABLED` contains information if Server access logging was enabled for a given S3 bucket. This provides detailed records for the requests that are made to an S3 bucket. More information about Server Access Logging can be found [here](https://docs.aws.amazon.com/AmazonS3/latest/user-guide/server-access-logging.html)
- 4. Fourth column `ACL - IS PUBLIC` provides information if ACL (Access Control List) contains permissions, that make the bucket public (allow read/writes for anyone) - More information about ACLs [here](https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html)
- 5. Fifth column `POLICY - IS PUBLIC` contains information if bucket's policy allows any action (read/write) for an anonymous user. More about bucket policies [here](https://docs.aws.amazon.com/AmazonS3/latest/dev/using-iam-policies.html)
-
+ 4. Fourth column `ACL IS PUBLIC` provides information if ACL (Access Control List) contains permissions, that make the bucket public (allow read/writes for anyone). More information about ACLs [here](https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html)
+ 5. Fifth column `POLICY IS PUBLIC` contains information if bucket's policy allows any action (read/write) for an anonymous user. More about bucket policies [here](https://docs.aws.amazon.com/AmazonS3/latest/dev/using-iam-policies.html)
+R, W and D letters describe what type of action is available for everyone.
 #### Docs
 You can find more about securing your S3's in the following documentations:
  1. https://docs.aws.amazon.com/AmazonS3/latest/dev/serv-side-encryption.html

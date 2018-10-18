@@ -47,7 +47,7 @@ func (s3br *S3BucketReport) CheckEncryptionType(s3EncryptionType s3.ServerSideEn
 }
 
 func (s3brs *S3BucketReports) GetHeaders() []string {
-	return []string{"Bucket Name", "Default SSE", "Logging\nEnabled", "ACL\nis public", "Policy\nis public"}
+	return []string{"Bucket Name", "Default\nSSE", "Logging\nEnabled", "ACL\nis public\nR - Read\nW - Write\nD - Delete", "Policy\nis public\nR - Read\nW - Write\nD - Delete"}
 }
 
 func (s3brs *S3BucketReports) FormatDataToTable() [][]string {
