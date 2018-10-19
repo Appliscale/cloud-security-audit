@@ -36,10 +36,13 @@ jobs:
     steps:
       - attach_workspace:
           at: ./release
+      - add_ssh_keys:
+          fingerprints:
+            - "19:d5:23:85:1c:f4:7a:86:47:88:9a:e2:d7:da:ef:3a"
       - run:
           name: "Publish Release on GitHub"
           command: |
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} ./release/
+            ghr -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} ./release/
 
 
 workflows:
