@@ -9,3 +9,62 @@ jobs:
       - run: make get-deps
       - run: make code-analysis
       - run: make test
+
+  release:
+    docker:
+      - image: circleci/golang:1.9
+    working_directory: /go/src/github.com/Appliscale/tyr
+    steps:
+      - checkout
+      - run: make
+      - run: mkdir -p release
+      - run:
+          name: "Build Tyr for Linux"
+          command: |
+            GOOS=linux GOARCH=amd64 go build -o release/tyr-linux-amd64
+            tar -C release -czf release/tyr-linux-amd64.tar.gz tyr-linux-amd64
+      - run:
+          name: "Build Tyr for Darwin"
+          command: |
+            GOOS=darwin GOARCH=amd64 go build -o release/tyr-darwin-amd64
+            tar -C release -czf release/tyr-darwin-amd64.tar.gz tyr-darwin-amd64
+
+  publish-github-release:
+    docker:
+      - image: cibuilds/github:0.10
+    working_directory: /go/src/github.com/Appliscale/tyr
+    steps:
+      - attach_workspace:
+          at: ./release
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} ./release/
+
+
+workflows:
+  version: 2
+  main:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /^\d+\.\d+(\.\d+)?$/
+      - release:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^\d+\.\d+(\.\d+)?$/
+
+      - publish-github-release:
+          requires:
+            - build
+            - release
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^\d+\.\d+(\.\d+)?$/
