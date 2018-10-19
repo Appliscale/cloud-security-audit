@@ -2,6 +2,7 @@ package report
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/Appliscale/tyr/configuration"
 	"github.com/Appliscale/tyr/resource"
@@ -16,8 +17,8 @@ type S3BucketReport struct {
 	Name string
 	EncryptionType
 	LoggingEnabled bool
-	ACLIsPublic    bool
-	PolicyIsPublic bool
+	ACLIsPublic    string
+	PolicyIsPublic string
 }
 
 type S3BucketReports []*S3BucketReport
@@ -46,7 +47,7 @@ func (s3br *S3BucketReport) CheckEncryptionType(s3EncryptionType s3.ServerSideEn
 }
 
 func (s3brs *S3BucketReports) GetHeaders() []string {
-	return []string{"Bucket Name", "Default SSE", "Logging Enabled", "ACL - is public", "Policy - is public"}
+	return []string{"Bucket Name", "Default\nSSE", "Logging\nEnabled", "ACL\nis public\nR - Read\nW - Write\nD - Delete", "Policy\nis public\nR - Read\nW - Write\nD - Delete"}
 }
 
 func (s3brs *S3BucketReports) FormatDataToTable() [][]string {
@@ -57,18 +58,20 @@ func (s3brs *S3BucketReports) FormatDataToTable() [][]string {
 			s3br.Name,
 			s3br.EncryptionType.String(),
 			strconv.FormatBool(s3br.LoggingEnabled),
-			strconv.FormatBool(s3br.ACLIsPublic),
-			strconv.FormatBool(s3br.PolicyIsPublic),
+			s3br.ACLIsPublic,
+			s3br.PolicyIsPublic,
 		}
 		data = append(data, row)
 	}
 	return data
 }
 
-func isBucketACLPublic(s3Bucket *resource.S3Bucket) bool {
+func isBucketACLPublic(s3Bucket *resource.S3Bucket) (bool, string) {
 
 	grants := s3Bucket.ACL.Grants
 	ownerID := s3Bucket.ACL.Owner.ID
+	accessTypeACL := ""
+	isPublic := false
 
 	var uriGroups = []string{
 		"http://acs.amazonaws.com/groups/global/AuthenticatedUsers",
@@ -83,6 +86,7 @@ func isBucketACLPublic(s3Bucket *resource.S3Bucket) bool {
 	}
 
 	for _, grant := range grants {
+		isPublic = false
 		granteeURI := grant.Grantee.URI
 		granteePermission := grant.Permission
 		granteeID := grant.Grantee.ID
@@ -90,13 +94,24 @@ func isBucketACLPublic(s3Bucket *resource.S3Bucket) bool {
 			if granteeID != ownerID {
 				if (granteeURI != nil && isStringInArray(*granteeURI, uriGroups)) &&
 					(granteePermission != nil && isStringInArray(*granteePermission, permissionsACL)) {
-					return true
+					if !strings.Contains(accessTypeACL, getTypeOfAccessACL(*granteePermission)) {
+						accessTypeACL = accessTypeACL + getTypeOfAccessACL(*granteePermission)
+					}
+					isPublic = true
 				}
 			}
 		}
 	}
-	return false
+	return isPublic, accessTypeACL
 
+}
+
+func getTypeOfAccessACL(granteePermission string) string {
+	if granteePermission == "FULL_CONTROL" {
+		return "RWD"
+	}
+	accessTypeACL := string(granteePermission[0])
+	return accessTypeACL
 }
 
 func isStringInArray(element string, array []string) bool {
@@ -108,8 +123,9 @@ func isStringInArray(element string, array []string) bool {
 	return false
 }
 
-func isBucketPolicyPublic(s3Bucket *resource.S3Bucket) bool {
+func isBucketPolicyPublic(s3Bucket *resource.S3Bucket) (bool, string) {
 	isPublic := make(map[string]bool)
+	accessTypePolicy := ""
 	if s3Bucket.S3Policy != nil {
 		bucketPolicy := s3Bucket.S3Policy
 		stat := bucketPolicy.Statements
@@ -118,6 +134,7 @@ func isBucketPolicyPublic(s3Bucket *resource.S3Bucket) bool {
 			isPublic[effect] = false
 			isPublic[action] = false
 			isPublic[principal] = false
+			accessTypePolicy = ""
 
 			//Effect
 			if element.Effect == "Allow" {
@@ -126,6 +143,7 @@ func isBucketPolicyPublic(s3Bucket *resource.S3Bucket) bool {
 			//Action
 			if len(element.Actions) > 0 {
 				isPublic[action] = true
+				accessTypePolicy = getTypeOfAccessPolicy(element.Actions)
 			}
 			//Principal
 			if element.Principal.Wildcard != "" && element.Principal.Wildcard == "*" {
@@ -141,10 +159,25 @@ func isBucketPolicyPublic(s3Bucket *resource.S3Bucket) bool {
 			}
 		}
 		if isPublic[action] && isPublic[effect] && isPublic[principal] {
-			return true
+			return true, accessTypePolicy
 		}
 	}
-	return false
+	return false, ""
+}
+
+func getTypeOfAccessPolicy(actions resource.Actions) string {
+	var types string
+	for _, action := range actions {
+		if strings.Contains(action, "Get") || strings.Contains(action, "List") {
+			types = types + "R"
+		} else if strings.Contains(action, "Delete") {
+			types = types + "D"
+		} else if strings.Contains(action, "Put") || strings.Contains(action, "Create") {
+			types = types + "W"
+		}
+	}
+	types = "[" + types + "]"
+	return types
 }
 
 func (s3brs *S3BucketReports) GenerateReport(r *S3ReportRequiredResources) {
@@ -163,9 +196,14 @@ func (s3brs *S3BucketReports) GenerateReport(r *S3ReportRequiredResources) {
 		} else {
 			ok = false
 		}
-		s3BucketReport.PolicyIsPublic = isBucketPolicyPublic(s3Bucket)
-		s3BucketReport.ACLIsPublic = isBucketACLPublic(s3Bucket)
-
+		policy, policyTypes := isBucketPolicyPublic(s3Bucket)
+		s3BucketReport.PolicyIsPublic = strconv.FormatBool(policy) + " " + policyTypes
+		acl, aclTypes := isBucketACLPublic(s3Bucket)
+		if len(aclTypes) == 0 {
+			s3BucketReport.ACLIsPublic = strconv.FormatBool(acl)
+		} else {
+			s3BucketReport.ACLIsPublic = strconv.FormatBool(acl) + " " + "[" + aclTypes + "]"
+		}
 		if !ok {
 			*s3brs = append(*s3brs, s3BucketReport)
 		}
