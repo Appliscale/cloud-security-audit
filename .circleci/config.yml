@@ -13,7 +13,6 @@ jobs:
   release:
     docker:
       - image: circleci/golang:1.9
-      - image: cibuilds/github:0.10
     working_directory: /go/src/github.com/Appliscale/tyr
     steps:
       - checkout
@@ -29,6 +28,19 @@ jobs:
           command: |
             GOOS=darwin GOARCH=amd64 go build -o release/tyr-darwin-amd64
             tar -C release -czf release/tyr-darwin-amd64.tar.gz tyr-darwin-amd64
+      - persist_to_workspace:
+          root: release
+          paths:
+            - tyr-darwin-amd64.tar.gz
+            - tyr-linux-amd64.tar.gz
+
+  publish-github-release:
+    docker:
+      - image: cibuilds/github:0.10
+    working_directory: /go/src/github.com/Appliscale/tyr
+    steps:
+      - attach_workspace:
+          at: /go/src/github.com/Appliscale/tyr/release
       - run:
           name: "Publish Release on GitHub"
           command: |
@@ -46,6 +58,16 @@ workflows:
       - release:
           requires:
             - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^\d+\.\d+(\.\d+)?$/
+
+
+      - publish-github-release:
+          requires:
+            - release
           filters:
             branches:
               ignore: /.*/
