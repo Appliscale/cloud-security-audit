@@ -28,18 +28,15 @@ jobs:
           command: |
             GOOS=darwin GOARCH=amd64 go build -o release/tyr-darwin-amd64
             tar -C release -czf release/tyr-darwin-amd64.tar.gz tyr-darwin-amd64
-
-  publish-github-release:
-    docker:
-      - image: cibuilds/github:0.10
-    working_directory: /go/src/github.com/Appliscale/tyr
-    steps:
-      - attach_workspace:
-          at: ./release
       - run:
-          name: "Publish Release on GitHub"
+          name: "Get gothub"
           command: |
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} ./release/
+            go get github.com/itchio/gothub
+      - run:
+          name: "Publish release on github"
+          command: |
+            gothub upload --user ${CIRCLE_PROJECT_USERNAME} --repo ${CIRCLE_PROJECT_REPONAME} --tag ${CIRCLE_TAG} --name "tyr-darwin-amd64" --file release/tyr-darwin-amd64.tar.gz
+            gothub upload --user ${CIRCLE_PROJECT_USERNAME} --repo ${CIRCLE_PROJECT_REPONAME} --tag ${CIRCLE_TAG} --name "tyr-linux-amd64" --file release/tyr-linux-amd64.tar.gz
 
 
 workflows:
@@ -53,16 +50,6 @@ workflows:
       - release:
           requires:
             - build
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^\d+\.\d+(\.\d+)?$/
-
-      - publish-github-release:
-          requires:
-            - build
-            - release
           filters:
             branches:
               ignore: /.*/
