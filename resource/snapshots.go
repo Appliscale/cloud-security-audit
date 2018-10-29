@@ -1,8 +1,8 @@
 package resource
 
 import (
-	"github.com/Appliscale/tyr/configuration"
-	"github.com/Appliscale/tyr/tyrsession"
+	"github.com/Appliscale/cloud-security-audit/configuration"
+	"github.com/Appliscale/cloud-security-audit/csasession"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -11,7 +11,7 @@ import (
 type Snapshots []*ec2.Snapshot
 
 func (s *Snapshots) LoadFromAWS(config *configuration.Config, region string) error {
-	ec2API, err := config.ClientFactory.GetEc2Client(tyrsession.SessionConfig{Profile: config.Profile, Region: region})
+	ec2API, err := config.ClientFactory.GetEc2Client(csasession.SessionConfig{Profile: config.Profile, Region: region})
 	if err != nil {
 		return err
 	}

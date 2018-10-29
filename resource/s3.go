@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/Appliscale/tyr/configuration"
-	"github.com/Appliscale/tyr/tyrsession"
+	"github.com/Appliscale/cloud-security-audit/configuration"
+	"github.com/Appliscale/cloud-security-audit/csasession"
 
-	"github.com/Appliscale/tyr/tyrsession/clientfactory"
+	"github.com/Appliscale/cloud-security-audit/csasession/clientfactory"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
@@ -24,7 +24,7 @@ type S3Bucket struct {
 type S3Buckets []*S3Bucket
 
 func (b *S3Buckets) LoadRegions(config *configuration.Config, region string) error {
-	sessionConfig := tyrsession.SessionConfig{Profile: config.Profile, Region: region}
+	sessionConfig := csasession.SessionConfig{Profile: config.Profile, Region: region}
 	err := config.SessionFactory.SetNormalizeBucketLocation(sessionConfig)
 	if err != nil {
 		return err
@@ -72,7 +72,7 @@ func (b *S3Buckets) LoadRegions(config *configuration.Config, region string) err
 
 // LoadNames : Get All S3 Bucket names
 func (b *S3Buckets) LoadNames(config *configuration.Config, region string) error {
-	s3API, err := config.ClientFactory.GetS3Client(tyrsession.SessionConfig{Profile: config.Profile, Region: region})
+	s3API, err := config.ClientFactory.GetS3Client(csasession.SessionConfig{Profile: config.Profile, Region: region})
 	if err != nil {
 		return err
 	}
@@ -113,7 +113,7 @@ func (b *S3Buckets) LoadFromAWS(config *configuration.Config, region string) err
 
 	for _, s3Bucket := range *b {
 		s3Client, err := config.ClientFactory.GetS3Client(
-			tyrsession.SessionConfig{
+			csasession.SessionConfig{
 				Profile: config.Profile,
 				Region:  *s3Bucket.Region,
 			})

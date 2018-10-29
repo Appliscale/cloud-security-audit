@@ -1,9 +1,9 @@
 package configuration
 
 import (
-	"github.com/Appliscale/tyr/logger"
-	"github.com/Appliscale/tyr/tyrsession/clientfactory/mocks"
-	"github.com/Appliscale/tyr/tyrsession/sessionfactory"
+	"github.com/Appliscale/cloud-security-audit/logger"
+	"github.com/Appliscale/cloud-security-audit/csasession/clientfactory/mocks"
+	"github.com/Appliscale/cloud-security-audit/csasession/sessionfactory"
 	"testing"
 )
 

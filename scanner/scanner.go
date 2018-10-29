@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Appliscale/tyr/configuration"
-	"github.com/Appliscale/tyr/report"
+	"github.com/Appliscale/cloud-security-audit/configuration"
+	"github.com/Appliscale/cloud-security-audit/report"
 )
 
 func Run(config *configuration.Config) error {

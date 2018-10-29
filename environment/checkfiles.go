@@ -3,7 +3,7 @@ package environment
 import (
 	"bufio"
 	"github.com/Appliscale/perun/helpers"
-	"github.com/Appliscale/tyr/configuration"
+	"github.com/Appliscale/cloud-security-audit/configuration"
 	"os"
 	"strconv"
 	"strings"

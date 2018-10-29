@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Appliscale/tyr/cmd"
+	"github.com/Appliscale/cloud-security-audit/cmd"
 )
 
 func main() {

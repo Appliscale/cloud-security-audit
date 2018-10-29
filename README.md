@@ -1,4 +1,4 @@
-# tyr
+# cloud-security-audit
 
 A command line security audit tool for Amazon Web Services
 
@@ -12,14 +12,14 @@ Currently Tyr does not support any package managers, but the work is in progress
 First of all you need to download Tyr to your GO workspace:
 
 ```bash
-$GOPATH $ go get github.com/Appliscale/tyr
-$GOPATH $ cd tyr
+$GOPATH $ go get github.com/Appliscale/cloud-security-audit
+$GOPATH $ cd cloud-security-audit
 ```
 
 Then build and install configuration for the application inside perun directory by executing:
 
 ```bash
-tyr $ make all
+cloud-security-audit $ make all
 ```
 
 ## Usage
@@ -27,14 +27,14 @@ tyr $ make all
 If you're using MFA you need to tell Tyr to authenticate you before trying to connect by using flag `--mfa`. 
 Example:
 ```
-$ tyr --service s3 --mfa --mfa-duration 3600
+$ cloud-security-audit --service s3 --mfa --mfa-duration 3600
 ```
 
 ### EC2 Scan
 #### How to use
 To perform audit on all EC2 instances, type:
 ```
-$ tyr --service ec2
+$ cloud-security-audit --service ec2
 ```
 You can narrow the audit to a region, by using the flag `-r` or `--region`. Tyr also supports AWS profiles -
 to specify profile use the flag `-p` or `--profile`.
@@ -75,7 +75,7 @@ You can find more information about encryption in the following documentation:
 #### How to use
 To perform audit on all S3 buckets, type:
 ```
-$ tyr --service s3
+$ cloud-security-audit --service s3
 ```
 Tyr supports AWS profiles - to specify profile use the flag `-p` or `--profile`.
 

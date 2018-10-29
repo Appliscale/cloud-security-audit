@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"sync"
 
-	"github.com/Appliscale/tyr/configuration"
+	"github.com/Appliscale/cloud-security-audit/configuration"
 )
 
 type Resource interface {
