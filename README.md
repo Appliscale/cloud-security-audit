@@ -1,15 +1,16 @@
-# cloud-security-audit
+# Cloud Security Audit [![Release](https://img.shields.io/github/release/Appliscale/tyr.svg?style=flat-square)](https://github.com/Appliscale/tyr/releases/latest) [![CircleCI](https://circleci.com/gh/Appliscale/tyr.svg?style=svg)](https://circleci.com/gh/Appliscale/tyr) [![License](https://img.shields.io/badge/License-Apache%202.0-orange.svg)](https://github.com/Appliscale/tyr/blob/master/LICENSE.md)  [![Go_Report_Card](https://goreportcard.com/badge/github.com/Appliscale/tyr?style=flat-square&fuckgithubcache=1)](https://goreportcard.com/report/github.com/Appliscale/tyr) [![GoDoc](https://godoc.org/github.com/Appliscale/tyr?status.svg)](https://godoc.org/github.com/Appliscale/tyr)
+
 
 A command line security audit tool for Amazon Web Services
 
 ## About
-Tyr is a command line tool that scans for vulnerabilities in your AWS Account. In easy way you will be able to
+Cloud Security Audit is a command line tool that scans for vulnerabilities in your AWS Account. In easy way you will be able to
 identify unsecure parts of your infrastructure and prepare your AWS account for security audit.
 
 ## Installation
-Currently Tyr does not support any package managers, but the work is in progress. 
+Currently Cloud Security Audit does not support any package managers, but the work is in progress. 
 ### Building from sources
-First of all you need to download Tyr to your GO workspace:
+First of all you need to download Cloud Security Audit to your GO workspace:
 
 ```bash
 $GOPATH $ go get github.com/Appliscale/cloud-security-audit
@@ -24,7 +25,7 @@ cloud-security-audit $ make all
 
 ## Usage
 ### Initialising Session
-If you're using MFA you need to tell Tyr to authenticate you before trying to connect by using flag `--mfa`. 
+If you're using MFA you need to tell Cloud Security Audit to authenticate you before trying to connect by using flag `--mfa`. 
 Example:
 ```
 $ cloud-security-audit --service s3 --mfa --mfa-duration 3600
@@ -36,7 +37,7 @@ To perform audit on all EC2 instances, type:
 ```
 $ cloud-security-audit --service ec2
 ```
-You can narrow the audit to a region, by using the flag `-r` or `--region`. Tyr also supports AWS profiles -
+You can narrow the audit to a region, by using the flag `-r` or `--region`. Cloud Security Audit also supports AWS profiles -
 to specify profile use the flag `-p` or `--profile`.
 
 #### Example output
@@ -77,7 +78,7 @@ To perform audit on all S3 buckets, type:
 ```
 $ cloud-security-audit --service s3
 ```
-Tyr supports AWS profiles - to specify profile use the flag `-p` or `--profile`.
+Cloud Security Audit supports AWS profiles - to specify profile use the flag `-p` or `--profile`.
 
 #### Example output
 
