@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"errors"
-	"github.com/Appliscale/tyr/configuration"
+	"github.com/Appliscale/cloud-security-audit/configuration"
 	"github.com/stretchr/testify/assert"
 )
 

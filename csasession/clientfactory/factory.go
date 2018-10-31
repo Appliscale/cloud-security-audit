@@ -1,7 +1,7 @@
 package clientfactory
 
 import (
-	"github.com/Appliscale/tyr/tyrsession/sessionfactory"
+	"github.com/Appliscale/cloud-security-audit/csasession/sessionfactory"
 )
 
 // ClientFactory provides methods for creation and management of service clients.

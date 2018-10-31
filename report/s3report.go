@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Appliscale/tyr/configuration"
-	"github.com/Appliscale/tyr/resource"
+	"github.com/Appliscale/cloud-security-audit/configuration"
+	"github.com/Appliscale/cloud-security-audit/resource"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 

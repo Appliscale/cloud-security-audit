@@ -1,14 +1,14 @@
 package sessionfactory
 
 import (
-	"github.com/Appliscale/tyr/tyrsession"
+	"github.com/Appliscale/cloud-security-audit/csasession"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 // GetSession returns cached AWS session.
-func (factory *SessionFactory) GetSession(config tyrsession.SessionConfig) (*session.Session, error) {
+func (factory *SessionFactory) GetSession(config csasession.SessionConfig) (*session.Session, error) {
 	factory.mutex.Lock()
 	defer factory.mutex.Unlock()
 
@@ -20,8 +20,8 @@ func (factory *SessionFactory) GetSession(config tyrsession.SessionConfig) (*ses
 }
 
 // NewSession creates a new session and caches it.
-func (factory *SessionFactory) NewSession(config tyrsession.SessionConfig) (*session.Session, error) {
-	sess, err := tyrsession.CreateSession(config)
+func (factory *SessionFactory) NewSession(config csasession.SessionConfig) (*session.Session, error) {
+	sess, err := csasession.CreateSession(config)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func (factory *SessionFactory) NewSession(config tyrsession.SessionConfig) (*ses
 	return sess, nil
 }
 
-func (factory *SessionFactory) SetNormalizeBucketLocation(config tyrsession.SessionConfig) error {
+func (factory *SessionFactory) SetNormalizeBucketLocation(config csasession.SessionConfig) error {
 	sess, err := factory.GetSession(config)
 	if err != nil {
 		return err
@@ -39,7 +39,7 @@ func (factory *SessionFactory) SetNormalizeBucketLocation(config tyrsession.Sess
 	return nil
 }
 
-func (factory *SessionFactory) ReinitialiseSession(config tyrsession.SessionConfig) (err error) {
+func (factory *SessionFactory) ReinitialiseSession(config csasession.SessionConfig) (err error) {
 	factory.mutex.Lock()
 	defer factory.mutex.Unlock()
 

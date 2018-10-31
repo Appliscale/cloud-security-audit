@@ -2,9 +2,9 @@ package report
 
 import (
 	"bytes"
-	"github.com/Appliscale/tyr/configuration"
-	"github.com/Appliscale/tyr/environment"
-	"github.com/Appliscale/tyr/resource"
+	"github.com/Appliscale/cloud-security-audit/configuration"
+	"github.com/Appliscale/cloud-security-audit/environment"
+	"github.com/Appliscale/cloud-security-audit/resource"
 	"sort"
 	"strconv"
 	"strings"

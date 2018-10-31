@@ -3,12 +3,12 @@ package cmd
 import (
 	"os"
 
-	"github.com/Appliscale/tyr/configuration"
-	"github.com/Appliscale/tyr/resource"
-	"github.com/Appliscale/tyr/tyrsession"
+	"github.com/Appliscale/cloud-security-audit/configuration"
+	"github.com/Appliscale/cloud-security-audit/resource"
+	"github.com/Appliscale/cloud-security-audit/csasession"
 
-	"github.com/Appliscale/tyr/environment"
-	"github.com/Appliscale/tyr/scanner"
+	"github.com/Appliscale/cloud-security-audit/environment"
+	"github.com/Appliscale/cloud-security-audit/scanner"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +17,7 @@ var config = configuration.GetConfig()
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "tyr",
+	Use:   "cloud-security-audit",
 	Short: "Scan for vulnerabilities in your AWS Account.",
 	Long:  `Scan for vulnerabilities in your AWS Account.`,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -65,7 +65,7 @@ func getRegions() *[]string {
 		return &[]string{region}
 	}
 
-	return tyrsession.GetAvailableRegions()
+	return csasession.GetAvailableRegions()
 }
 
 func getServices() *[]string {

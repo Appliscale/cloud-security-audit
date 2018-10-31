@@ -1,4 +1,4 @@
-package tyrsession
+package csasession
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
