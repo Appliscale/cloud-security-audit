@@ -106,7 +106,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/cloud-security-audit/dev/1547745303942-2019-01-17T17:15:03.942Z/cloud-security-audit.zip"
+                "S3Key": "serverless/cloud-security-audit/dev/1547752077189-2019-01-17T19:07:57.189Z/cloud-security-audit.zip"
               },
               "FunctionName": "cloud-security-audit-dev-hello",
               "Handler": "cloud-security-audit",
@@ -125,14 +125,142 @@
               "IamRoleLambdaExecution"
             ]
           },
-          "HelloLambdaVersion4rx1weq3VdntO3meXqO1SzuQbA755fK9CQxpI5gEPw8": {
+          "HelloLambdaVersionbvUWSbF8Gxt59MDh5abptVK0Dsk4Sb7x08BFgs": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "HelloLambdaFunction"
               },
-              "CodeSha256": "E1XAdJx0+BHoSTsgxLyY/lk2IfCFN//FmvRt5wVMF3E="
+              "CodeSha256": "W7M4YF7tD5DWqcHJzLoP08YEwUzd431ZrhE5Vl/RN4A="
+            }
+          },
+          "ApiGatewayRestApi": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+              "Name": "dev-cloud-security-audit",
+              "EndpointConfiguration": {
+                "Types": [
+                  "EDGE"
+                ]
+              }
+            }
+          },
+          "ApiGatewayResourceCloudDashsecurityDashaudit": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "cloud-security-audit",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodCloudDashsecurityDashauditPost": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "POST",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceCloudDashsecurityDashaudit"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "HelloLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayDeployment1547752077421": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "StageName": "dev"
+            },
+            "DependsOn": [
+              "ApiGatewayMethodCloudDashsecurityDashauditPost"
+            ]
+          },
+          "HelloLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "HelloLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "apigateway.",
+                    {
+                      "Ref": "AWS::URLSuffix"
+                    }
+                  ]
+                ]
+              },
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
             }
           }
         },
@@ -145,7 +273,26 @@
           "HelloLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "HelloLambdaVersion4rx1weq3VdntO3meXqO1SzuQbA755fK9CQxpI5gEPw8"
+              "Ref": "HelloLambdaVersionbvUWSbF8Gxt59MDh5abptVK0Dsk4Sb7x08BFgs"
+            }
+          },
+          "ServiceEndpoint": {
+            "Description": "URL of the service endpoint",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.us-east-1.",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  },
+                  "/dev"
+                ]
+              ]
             }
           }
         }
@@ -172,7 +319,15 @@
     "functions": {
       "hello": {
         "handler": "cloud-security-audit",
-        "events": [],
+        "events": [
+          {
+            "http": {
+              "path": "cloud-security-audit",
+              "method": "post",
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
         "name": "cloud-security-audit-dev-hello",
         "package": {},
         "memory": 1024,
@@ -185,7 +340,7 @@
     "artifact": "/home/sylwia/go/src/github.com/Appliscale/cloud-security-audit/.serverless/cloud-security-audit.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/cloud-security-audit/dev/1547745303942-2019-01-17T17:15:03.942Z",
+    "artifactDirectoryName": "serverless/cloud-security-audit/dev/1547752077189-2019-01-17T19:07:57.189Z",
     "artifact": "cloud-security-audit.zip"
   }
 }
