@@ -10,6 +10,7 @@ import (
 	"github.com/Appliscale/cloud-security-audit/environment"
 	"github.com/Appliscale/cloud-security-audit/scanner"
 	"github.com/spf13/cobra"
+	"github.com/Appliscale/cloud-security-audit/report"
 )
 
 // var cfgFile string
@@ -92,30 +93,23 @@ func getProfile() string {
 	return "default"
 }
 
-const (
-	TABLE = iota
-	JSON
-	HTML
-	CSV
-)
 
-var possibleFormats = map[string]int{"TABLE": TABLE, "JSON": JSON, "HTML": HTML, "CSV": CSV}
-
-func getFormat() int {
-	for formatName, formatValue := range possibleFormats {
+var printFormats = map[string]func(report.Report) {"TABLE": report.PrintTable, "JSON": report.PrintJsonReport, "HTML": report.PrintHtmlReport, "CSV": report.PrintCSVReport}
+func getFormat() func(report.Report){
+	for formatName, formatValue := range printFormats {
 		if format == formatName {
 			return formatValue
 		}
 	}
 	config.Logger.Error("Wrong type: " + format + " Available are: TABLE, JSON, HTML, CSV. Using default: TABLE")
-	return TABLE
+	return report.PrintTable
 }
 
 func initConfig() {
 	config.Regions = getRegions()
 	config.Services = getServices()
 	config.Profile = getProfile()
-	config.Format = getFormat()
+	config.PrintFormat = getFormat()
 	config.OutputFile = outputFile
 	config.Mfa = mfa
 	config.MfaDuration = mfaDuration

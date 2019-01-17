@@ -29,7 +29,7 @@ type S3ReportRequiredResources struct {
 	S3Buckets *resource.S3Buckets
 }
 
-func (s3brs S3BucketReports) GetJsonReport() ([]byte, error) {
+func (s3brs *S3BucketReports) GetJsonReport() ([]byte, error) {
 	return json.Marshal(s3brs)
 }
 
@@ -51,7 +51,7 @@ func (s3br *S3BucketReport) CheckEncryptionType(s3EncryptionType s3.ServerSideEn
 	}
 }
 
-func (s3brs *S3BucketReports) GetHeaders() []string {
+func (s3brs *S3BucketReports) GetTableHeaders() []string {
 	return []string{"Bucket Name", "Default\nSSE", "Logging\nEnabled", "ACL\nis public\nR - Read\nW - Write\nD - Delete", "Policy\nis public\nR - Read\nW - Write\nD - Delete"}
 }
 

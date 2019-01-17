@@ -8,7 +8,22 @@ import (
 
 type Report interface {
 	FormatDataToTable() [][]string
-	GetHeaders() []string
+	GetTableHeaders() []string
+	GetJsonReport() ([]byte, error)
+	//GetHtmlReport()
+	//GetCSVReport()
+}
+
+func PrintJsonReport(r Report) {
+	r.GetJsonReport()
+}
+
+func PrintHtmlReport(r Report) {
+	//	TODO:
+}
+
+func PrintCSVReport(r Report) {
+	//	TODO:
 }
 
 func PrintTable(r Report) {
@@ -19,7 +34,7 @@ func PrintTable(r Report) {
 	// Configure Headers
 	table.SetReflowDuringAutoWrap(false)
 	table.SetAutoFormatHeaders(false)
-	table.SetHeader(customFormatHeaders(r.GetHeaders()))
+	table.SetHeader(customFormatHeaders(r.GetTableHeaders()))
 	// Configure rows&cells
 	table.SetRowSeparator("-")
 	table.SetRowLine(true)
