@@ -4,8 +4,8 @@ import (
 	"os"
 
 	"github.com/Appliscale/cloud-security-audit/configuration"
-	"github.com/Appliscale/cloud-security-audit/resource"
 	"github.com/Appliscale/cloud-security-audit/csasession"
+	"github.com/Appliscale/cloud-security-audit/resource"
 
 	"github.com/Appliscale/cloud-security-audit/environment"
 	"github.com/Appliscale/cloud-security-audit/scanner"
@@ -45,6 +45,8 @@ var (
 	profile     string
 	mfa         bool
 	mfaDuration int64
+	format      string
+	outputFile  string
 )
 
 func init() {
@@ -58,6 +60,8 @@ func init() {
 
 	rootCmd.Flags().BoolVarP(&mfa, "mfa", "m", false, "indicates usage of Multi Factor Authentication")
 	rootCmd.Flags().Int64VarP(&mfaDuration, "mfa-duration", "d", 0, "sets the duration of the MFA session")
+	rootCmd.Flags().StringVarP(&format, "format", "f", "TABLE", "specifies output format, available are: JSON, HTML, CSV, TABLE")
+	rootCmd.Flags().StringVarP(&outputFile, "output", "o", "STDOUT", "specify output file")
 }
 
 func getRegions() *[]string {
@@ -88,10 +92,31 @@ func getProfile() string {
 	return "default"
 }
 
+const (
+	TABLE = iota
+	JSON
+	HTML
+	CSV
+)
+
+var possibleFormats = map[string]int{"TABLE": TABLE, "JSON": JSON, "HTML": HTML, "CSV": CSV}
+
+func getFormat() int {
+	for formatName, formatValue := range possibleFormats {
+		if format == formatName {
+			return formatValue
+		}
+	}
+	config.Logger.Error("Wrong type: " + format + " Available are: TABLE, JSON, HTML, CSV. Using default: TABLE")
+	return TABLE
+}
+
 func initConfig() {
 	config.Regions = getRegions()
 	config.Services = getServices()
 	config.Profile = getProfile()
+	config.Format = getFormat()
+	config.OutputFile = outputFile
 	config.Mfa = mfa
 	config.MfaDuration = mfaDuration
 	configuration.InitialiseMFA(config)

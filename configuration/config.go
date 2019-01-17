@@ -1,9 +1,9 @@
 package configuration
 
 import (
-	"github.com/Appliscale/cloud-security-audit/logger"
 	"github.com/Appliscale/cloud-security-audit/csasession/clientfactory"
 	"github.com/Appliscale/cloud-security-audit/csasession/sessionfactory"
+	"github.com/Appliscale/cloud-security-audit/logger"
 )
 
 type Config struct {
@@ -15,6 +15,8 @@ type Config struct {
 	Logger         *logger.Logger
 	Mfa            bool
 	MfaDuration    int64
+	Format         int
+	OutputFile     string
 }
 
 func GetConfig() (config Config) {
