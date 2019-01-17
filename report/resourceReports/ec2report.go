@@ -1,10 +1,11 @@
-package report
+package resourceReports
 
 import (
 	"bytes"
 	"encoding/json"
 	"github.com/Appliscale/cloud-security-audit/configuration"
 	"github.com/Appliscale/cloud-security-audit/environment"
+	"github.com/Appliscale/cloud-security-audit/report"
 	"github.com/Appliscale/cloud-security-audit/resource"
 	"sort"
 	"strconv"
@@ -12,11 +13,11 @@ import (
 )
 
 type Ec2Report struct {
-	VolumeReport      *VolumeReport	`json:"volume_report"`
-	InstanceID        string		`json:"instance_id"`
-	SortableTags      *SortableTags	`json:"sortable_tags"`
-	SecurityGroupsIDs []string		`json:"security_groups_ids"`
-	AvailabilityZone  string		`json:"availability_zone"`
+	VolumeReport      *VolumeReport `json:"volume_report"`
+	InstanceID        string        `json:"instance_id"`
+	SortableTags      *SortableTags `json:"sortable_tags"`
+	SecurityGroupsIDs []string      `json:"security_groups_ids"`
+	AvailabilityZone  string        `json:"availability_zone"`
 }
 
 func NewEc2Report(instanceID string) *Ec2Report {
@@ -105,12 +106,12 @@ func (e *Ec2Reports) GenerateReport(r *Ec2ReportRequiredResources) {
 			volume := r.Volumes.FindById(*blockDeviceMapping.Ebs.VolumeId)
 			if !*volume.Encrypted {
 				ec2OK = false
-				ec2Report.VolumeReport.AddEBS(*volume.VolumeId, NONE)
+				ec2Report.VolumeReport.AddEBS(*volume.VolumeId, report.NONE)
 			} else {
 				kmskey := r.KMSKeys.FindByKeyArn(*volume.KmsKeyId)
 				if !kmskey.Custom {
 					ec2OK = false
-					ec2Report.VolumeReport.AddEBS(*volume.VolumeId, DKMS)
+					ec2Report.VolumeReport.AddEBS(*volume.VolumeId, report.DKMS)
 				}
 			}
 		}

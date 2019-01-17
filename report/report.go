@@ -1,6 +1,7 @@
 package report
 
 import (
+	"fmt"
 	"github.com/olekukonko/tablewriter"
 	"os"
 	"strings"
@@ -11,11 +12,16 @@ type Report interface {
 	GetTableHeaders() []string
 	GetJsonReport() ([]byte, error)
 	//GetHtmlReport()
-	//GetCSVReport()
+	GetCsvReport() ([]byte, error)
 }
 
 func PrintJsonReport(r Report) {
-	r.GetJsonReport()
+	msg, err := r.GetJsonReport()
+	if err == nil {
+		fmt.Println(string(msg))
+	} else {
+		//	TODO: ERROR
+	}
 }
 
 func PrintHtmlReport(r Report) {
@@ -23,7 +29,12 @@ func PrintHtmlReport(r Report) {
 }
 
 func PrintCSVReport(r Report) {
-	//	TODO:
+	msg, err := r.GetCsvReport()
+	if err == nil {
+		fmt.Println(string(msg))
+	} else {
+		//	TODO: ERROR
+	}
 }
 
 func PrintTable(r Report) {

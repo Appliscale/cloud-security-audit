@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/Appliscale/cloud-security-audit/configuration"
-	"github.com/Appliscale/cloud-security-audit/report"
+	"github.com/Appliscale/cloud-security-audit/report/resourceReports"
 )
 
 func Run(config *configuration.Config) error {
@@ -14,7 +14,7 @@ func Run(config *configuration.Config) error {
 		switch strings.ToLower(service) {
 		case "ec2":
 			config.Logger.Info("Gathering information about EC2s...")
-			ec2Reports := report.Ec2Reports{}
+			ec2Reports := resourceReports.Ec2Reports{}
 			resources, err := ec2Reports.GetResources(config)
 			if err != nil {
 				return err
@@ -23,7 +23,7 @@ func Run(config *configuration.Config) error {
 			config.PrintFormat(&ec2Reports)
 		case "s3":
 			config.Logger.Info("Gathering information about S3s...")
-			s3BucketReports := report.S3BucketReports{}
+			s3BucketReports := resourceReports.S3BucketReports{}
 			resources, err := s3BucketReports.GetResources(config)
 			if err != nil {
 				return err

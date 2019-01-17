@@ -1,4 +1,4 @@
-package report
+package resourceReports
 
 import (
 	"encoding/json"
@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Appliscale/cloud-security-audit/configuration"
+	"github.com/Appliscale/cloud-security-audit/report"
 	"github.com/Appliscale/cloud-security-audit/resource"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
@@ -16,11 +17,11 @@ const effect = "Effect"
 const principal = "Principal"
 
 type S3BucketReport struct {
-	Name string				`json:"name"`
-	EncryptionType			`json:"encryption_type"`
-	LoggingEnabled bool		`json:"logging_enabled"`
-	ACLIsPublic    string	`json:"acl_is_public"`
-	PolicyIsPublic string	`json:"policy_is_public"`
+	Name                  string `json:"name"`
+	report.EncryptionType `json:"encryption_type"`
+	LoggingEnabled        bool   `json:"logging_enabled"`
+	ACLIsPublic           string `json:"acl_is_public"`
+	PolicyIsPublic        string `json:"policy_is_public"`
 }
 
 type S3BucketReports []*S3BucketReport
@@ -30,7 +31,7 @@ type S3ReportRequiredResources struct {
 	S3Buckets *resource.S3Buckets
 }
 
-func (s3brs *S3BucketReports) GetJsonReport() ([]byte, error) {
+func (s3brs S3BucketReports) GetJsonReport() ([]byte, error) {
 	return json.Marshal(s3brs)
 }
 
@@ -51,16 +52,16 @@ func (s3br *S3BucketReport) CheckEncryptionType(s3EncryptionType s3.ServerSideEn
 
 	switch *s3EncryptionType.SSEAlgorithm {
 	case "AES256":
-		s3br.EncryptionType = AES256
+		s3br.EncryptionType = report.AES256
 	case "aws:kms":
 		kmsKey := kmsKeys.FindByKeyArn(*s3EncryptionType.KMSMasterKeyID)
 		if kmsKey.Custom {
-			s3br.EncryptionType = CKMS
+			s3br.EncryptionType = report.CKMS
 		} else {
-			s3br.EncryptionType = DKMS
+			s3br.EncryptionType = report.DKMS
 		}
 	default:
-		s3br.EncryptionType = NONE
+		s3br.EncryptionType = report.NONE
 	}
 }
 
@@ -206,7 +207,7 @@ func (s3brs *S3BucketReports) GenerateReport(r *S3ReportRequiredResources) {
 		if v := s3Bucket.ServerSideEncryptionConfiguration; v != nil {
 			s3BucketReport.CheckEncryptionType(*v.Rules[0].ApplyServerSideEncryptionByDefault, r.KMSKeys)
 		} else {
-			s3BucketReport.EncryptionType = NONE
+			s3BucketReport.EncryptionType = report.NONE
 			ok = false
 		}
 		if s3Bucket.LoggingEnabled != nil {

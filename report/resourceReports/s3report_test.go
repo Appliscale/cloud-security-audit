@@ -1,9 +1,10 @@
-package report
+package resourceReports
 
 import (
 	"fmt"
 	"testing"
 
+	"github.com/Appliscale/cloud-security-audit/report"
 	"github.com/Appliscale/cloud-security-audit/resource"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -22,7 +23,7 @@ func TestS3Report_WhenSSEAlgorithmIsAES256CheckEncryptionTypeReturnsAES256(t *te
 		SSEAlgorithm: aws.String("AES256"),
 	}
 	s3BucketReport.CheckEncryptionType(AES256Rule, resource.NewKMSKeys())
-	assert.Equal(t, AES256, s3BucketReport.EncryptionType)
+	assert.Equal(t, report.AES256, s3BucketReport.EncryptionType)
 }
 
 func TestS3Report_WhenSSEAlgorithmIsCustomAWSKMSCheckEncryptionTypeReturnsCKMS(t *testing.T) {
@@ -39,7 +40,7 @@ func TestS3Report_WhenSSEAlgorithmIsCustomAWSKMSCheckEncryptionTypeReturnsCKMS(t
 	}
 
 	s3BucketReport.CheckEncryptionType(customKMSKeyRule, kmsKeys)
-	assert.Equalf(t, CKMS, s3BucketReport.EncryptionType, fmt.Sprintf("Expected %s, got %s", CKMS.String(), s3BucketReport.EncryptionType))
+	assert.Equalf(t, report.CKMS, s3BucketReport.EncryptionType, fmt.Sprintf("Expected %s, got %s", report.CKMS.String(), s3BucketReport.EncryptionType))
 }
 
 func TestS3Report_WhenSSEAlgorithmIsDefaultAWSKMSCheckEncryptionTypeReturnsDKMS(t *testing.T) {
@@ -54,7 +55,7 @@ func TestS3Report_WhenSSEAlgorithmIsDefaultAWSKMSCheckEncryptionTypeReturnsDKMS(
 		SSEAlgorithm:   aws.String("aws:kms"),
 	}
 	s3BucketReport.CheckEncryptionType(customKMSKeyRule, kmsKeys)
-	assert.Equal(t, DKMS, s3BucketReport.EncryptionType)
+	assert.Equal(t, report.DKMS, s3BucketReport.EncryptionType)
 }
 
 func TestGetTypeOfAccessACL(t *testing.T) {

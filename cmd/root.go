@@ -8,9 +8,9 @@ import (
 	"github.com/Appliscale/cloud-security-audit/resource"
 
 	"github.com/Appliscale/cloud-security-audit/environment"
+	"github.com/Appliscale/cloud-security-audit/report"
 	"github.com/Appliscale/cloud-security-audit/scanner"
 	"github.com/spf13/cobra"
-	"github.com/Appliscale/cloud-security-audit/report"
 )
 
 // var cfgFile string
@@ -93,9 +93,9 @@ func getProfile() string {
 	return "default"
 }
 
+var printFormats = map[string]func(report.Report){"TABLE": report.PrintTable, "JSON": report.PrintJsonReport, "HTML": report.PrintHtmlReport, "CSV": report.PrintCSVReport}
 
-var printFormats = map[string]func(report.Report) {"TABLE": report.PrintTable, "JSON": report.PrintJsonReport, "HTML": report.PrintHtmlReport, "CSV": report.PrintCSVReport}
-func getFormat() func(report.Report){
+func getFormat() func(report.Report) {
 	for formatName, formatValue := range printFormats {
 		if format == formatName {
 			return formatValue
