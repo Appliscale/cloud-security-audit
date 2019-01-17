@@ -2,7 +2,6 @@ package resourceReports
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -31,20 +30,34 @@ type S3ReportRequiredResources struct {
 	S3Buckets *resource.S3Buckets
 }
 
-func (s3brs S3BucketReports) GetJsonReport() ([]byte, error) {
-	return json.Marshal(s3brs)
-}
-
-func (s3brs S3BucketReports) GetCsvReport() ([]byte, error) {
-	output := make([]byte, 0)
-
-	for _, row := range s3brs {
-		s := fmt.Sprintf("%s,%s,%t,%s,%s\n", row.Name, row.EncryptionType, row.LoggingEnabled, row.ACLIsPublic,
-			row.PolicyIsPublic)
-		output = append(output, []byte(s)...)
+func (s3brs S3BucketReports) GetJsonReport() []byte {
+	output, err := json.Marshal(s3brs)
+	if err == nil {
+		return output
 	}
 
-	return output, nil
+	return []byte{}
+}
+
+func (s3brs S3BucketReports) GetCsvReport() []byte {
+	const externalSep = ","
+
+	csv := make([]string, 0)
+
+	for _, row := range s3brs {
+		rowStr := make([]string, 0)
+
+		s := strings.Join([]string{
+			row.Name,
+			string(row.EncryptionType),
+			strconv.FormatBool(row.LoggingEnabled),
+			row.ACLIsPublic,
+			row.PolicyIsPublic}, externalSep)
+
+		rowStr = append(rowStr, s)
+	}
+
+	return []byte(strings.Join(csv, "\n"))
 }
 
 // CheckEncryptionType : Returns Encryption Type (AES256, CKMS, DKMS, NONE)

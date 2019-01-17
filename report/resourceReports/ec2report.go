@@ -3,6 +3,7 @@ package resourceReports
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/Appliscale/cloud-security-audit/configuration"
 	"github.com/Appliscale/cloud-security-audit/environment"
 	"github.com/Appliscale/cloud-security-audit/report"
@@ -38,43 +39,37 @@ type Ec2ReportRequiredResources struct {
 	AvailabilityZone string
 }
 
-func (e Ec2Reports) GetJsonReport() ([]byte, error) {
-	return json.Marshal(e)
-}
-
-func (e Ec2Reports) GetCsvReport() ([]byte, error) {
-	output := make([]byte, 0)
-
-	for _, row := range e {
-		for _, i := range *row.VolumeReport {
-			output = append(output, []byte(i)...)
-			output = append(output, ';')
-		}
-
-		output = append(output, ',')
-		output = append(output, []byte(row.InstanceID)...)
-		output = append(output, ',')
-
-		for tag, val := range row.SortableTags.Tags {
-			output = append(output, []byte(tag)...)
-			output = append(output, ';')
-			output = append(output, []byte(val)...)
-			output = append(output, ';')
-		}
-
-		output = append(output, ',')
-
-		for _, i := range row.SecurityGroupsIDs {
-			output = append(output, []byte(i)...)
-			output = append(output, ';')
-		}
-
-		output = append(output, ',')
-		output = append(output, []byte(row.AvailabilityZone)...)
-		output = append(output, '\n')
+func (e Ec2Reports) GetJsonReport() []byte {
+	output, err := json.Marshal(e)
+	if err == nil {
+		return output
 	}
 
-	return output, nil
+	return []byte{}
+}
+
+func (e Ec2Reports) GetCsvReport() []byte {
+	const internalSep = ";"
+	const externalSep = ","
+
+	csv := make([]string, 0)
+
+	for _, row := range e {
+		rowStr := make([]string, 0)
+
+		rowStr = append(rowStr, strings.Join(*row.VolumeReport, internalSep))
+		rowStr = append(rowStr, row.InstanceID)
+
+		for tag, val := range row.SortableTags.Tags {
+			rowStr = append(rowStr, fmt.Sprintf("%s%s%s", tag, internalSep, val))
+		}
+
+		rowStr = append(rowStr, strings.Join(row.SecurityGroupsIDs, internalSep))
+
+		csv = append(csv, strings.Join(rowStr, externalSep))
+	}
+
+	return []byte(strings.Join(csv, "\n"))
 }
 
 func (e *Ec2Reports) GetTableHeaders() []string {
