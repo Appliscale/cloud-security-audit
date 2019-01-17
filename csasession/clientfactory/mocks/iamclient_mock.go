@@ -34,10 +34,10 @@ func (m *MockIAMClient) EXPECT() *MockIAMClientMockRecorder {
 }
 
 // ListUsers mocks base method
-func (m *MockIAMClient) ListUsers(input *iam.ListUsersInput) (*iam.ListUsersOutput, error) {
+func (m *MockIAMClient) ListUsers(input *iam.GetAccountAuthorizationDetailsInput) (*iam.GetAccountAuthorizationDetailsOutput, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListUsers", input)
-	ret0, _ := ret[0].(*iam.ListUsersOutput)
+	ret0, _ := ret[0].(*iam.GetAccountAuthorizationDetailsOutput)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

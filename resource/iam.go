@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/iam"
 )
 
-type Users []*iam.User
+type Users []*iam.UserDetail
 
 type IAMInfo struct {
 	hasRootAccessKeys bool
@@ -28,13 +28,12 @@ func (iaminfo *IAMInfo) LoadFromAWS(config *configuration.Config, region string)
 		return err
 	}
 
-	q := &iam.ListUsersInput{}
+	q := &iam.GetAccountAuthorizationDetailsInput{}
 
 	// get Users
 	result, err := iamAPI.ListUsers(q)
 	CheckError(region, config, err)
-	(*iaminfo).users = result.Users
-
+	(*iaminfo).users = result.UserDetailList
 	//get access keys for root
 
 	return nil

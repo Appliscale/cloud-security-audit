@@ -1,16 +1,22 @@
 package report
 
 import (
+	"fmt"
 	"github.com/Appliscale/cloud-security-audit/configuration"
 	"github.com/Appliscale/cloud-security-audit/resource"
+	"github.com/aws/aws-sdk-go/service/iam"
 )
 
 type IAMReport struct {
-	UserName string
+	UserName       string
+	InlinePolicies int
 }
 
-func NewIAMReport(userName string) *IAMReport {
-	return &IAMReport{UserName: userName}
+func NewIAMReport(u iam.UserDetail) *IAMReport {
+	return &IAMReport{
+		*u.UserName,
+		len(u.UserPolicyList),
+	}
 }
 
 type IAMReports []*IAMReport
@@ -20,14 +26,17 @@ type IAMReportRequiredResources struct {
 }
 
 func (i *IAMReports) GetHeaders() []string {
-	return []string{"User name"}
+	return []string{"User name", "Inline policies"}
 }
 
 func (i *IAMReports) FormatDataToTable() [][]string {
 	data := [][]string{}
 
 	for _, iamReport := range *i {
-		row := []string{iamReport.UserName}
+		row := []string{
+			iamReport.UserName,
+			fmt.Sprintf("%d", iamReport.InlinePolicies),
+		}
 		data = append(data, row)
 	}
 
@@ -36,7 +45,7 @@ func (i *IAMReports) FormatDataToTable() [][]string {
 
 func (i *IAMReports) GenerateReport(r *IAMReportRequiredResources) {
 	for _, user := range (*r.IAMInfo).GetUsers() {
-		iamReport := NewIAMReport(*user.UserName)
+		iamReport := NewIAMReport(*user)
 		*i = append(*i, iamReport)
 	}
 
