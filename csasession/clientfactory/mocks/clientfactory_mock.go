@@ -12,6 +12,7 @@ type ClientFactoryMock struct {
 	kmsClient *MockKmsClient
 	ec2Client *MockEC2Client
 	s3Client  *MockS3Client
+	iamClient *MockIAMClient
 }
 
 func NewClientFactoryMock(t *testing.T) ClientFactoryMock {
@@ -38,6 +39,12 @@ func (client *ClientFactoryMock) GetS3Client(config csasession.SessionConfig) (c
 		client.s3Client = NewMockS3Client(client.mockCtrl)
 	}
 	return client.s3Client, nil
+}
+func (client *ClientFactoryMock) GetIAMClient(config csasession.SessionConfig) (clientfactory.IAMClient, error) {
+	if client.iamClient == nil {
+		client.iamClient = NewMockIAMClient(client.mockCtrl)
+	}
+	return client.iamClient, nil
 }
 
 func (client *ClientFactoryMock) Destroy() {
