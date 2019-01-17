@@ -54,6 +54,10 @@ package:
 functions:
   hello:
     handler: cloud-security-audit
+    events:
+     - http:
+         path: cloud-security-audit
+         method: post
   
 
 #    The following are a few example events you can configure

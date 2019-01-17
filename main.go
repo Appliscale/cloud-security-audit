@@ -1,21 +1,21 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"github.com/Appliscale/cloud-security-audit/cmd"
+	//	"github.com/Appliscale/cloud-security-audit/cmd"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-type MyEvent struct {
-	Name string `json:"name"`
+type Response struct {
+	Message string `json:"message"`
 }
 
-func HandleRequest(ctx context.Context, name MyEvent) (string, error) {
-	cmd.Execute()
-	return fmt.Sprintf("Hello %s!", name.Name), nil
+func Handler() (Response, error) {
+	//	cmd.Execute()
+	return Response{
+		Message: "Go Serverless v1.0! Your function executed successfully!",
+	}, nil
 }
 
 func main() {
-	lambda.Start(HandleRequest)
+	lambda.Start(Handler)
 }

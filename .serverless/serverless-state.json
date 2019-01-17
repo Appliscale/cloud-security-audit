@@ -1,8 +1,8 @@
 {
   "service": {
-    "service": "myservice",
+    "service": "cloud-security-audit",
     "serviceObject": {
-      "name": "myservice"
+      "name": "cloud-security-audit"
     },
     "provider": {
       "stage": "dev",
@@ -22,7 +22,7 @@
           "HelloLogGroup": {
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
-              "LogGroupName": "/aws/lambda/myservice-dev-hello"
+              "LogGroupName": "/aws/lambda/cloud-security-audit-dev-hello"
             }
           },
           "IamRoleLambdaExecution": {
@@ -51,7 +51,7 @@
                       "-",
                       [
                         "dev",
-                        "myservice",
+                        "cloud-security-audit",
                         "lambda"
                       ]
                     ]
@@ -66,7 +66,7 @@
                         ],
                         "Resource": [
                           {
-                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/myservice-dev-hello:*"
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/cloud-security-audit-dev-hello:*"
                           }
                         ]
                       },
@@ -77,7 +77,7 @@
                         ],
                         "Resource": [
                           {
-                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/myservice-dev-hello:*:*"
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/cloud-security-audit-dev-hello:*:*"
                           }
                         ]
                       }
@@ -90,7 +90,7 @@
                 "Fn::Join": [
                   "-",
                   [
-                    "myservice",
+                    "cloud-security-audit",
                     "dev",
                     "us-east-1",
                     "lambdaRole"
@@ -106,9 +106,9 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/myservice/dev/1547744332780-2019-01-17T16:58:52.780Z/myservice.zip"
+                "S3Key": "serverless/cloud-security-audit/dev/1547745303942-2019-01-17T17:15:03.942Z/cloud-security-audit.zip"
               },
-              "FunctionName": "myservice-dev-hello",
+              "FunctionName": "cloud-security-audit-dev-hello",
               "Handler": "cloud-security-audit",
               "MemorySize": 1024,
               "Role": {
@@ -125,14 +125,14 @@
               "IamRoleLambdaExecution"
             ]
           },
-          "HelloLambdaVersion3gqkSplPjkJketu8JPI3iYHIvd4R0Blnithe6Iq3IZs": {
+          "HelloLambdaVersion4rx1weq3VdntO3meXqO1SzuQbA755fK9CQxpI5gEPw8": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "HelloLambdaFunction"
               },
-              "CodeSha256": "gwCZaP23O830dY3bkYjJClaytqTMEQJvUDO/B95AOtk="
+              "CodeSha256": "E1XAdJx0+BHoSTsgxLyY/lk2IfCFN//FmvRt5wVMF3E="
             }
           }
         },
@@ -145,7 +145,7 @@
           "HelloLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "HelloLambdaVersion3gqkSplPjkJketu8JPI3iYHIvd4R0Blnithe6Iq3IZs"
+              "Ref": "HelloLambdaVersion4rx1weq3VdntO3meXqO1SzuQbA755fK9CQxpI5gEPw8"
             }
           }
         }
@@ -173,7 +173,7 @@
       "hello": {
         "handler": "cloud-security-audit",
         "events": [],
-        "name": "myservice-dev-hello",
+        "name": "cloud-security-audit-dev-hello",
         "package": {},
         "memory": 1024,
         "timeout": 6,
@@ -182,10 +182,10 @@
       }
     },
     "layers": {},
-    "artifact": "/home/sylwia/go/src/github.com/Appliscale/cloud-security-audit/.serverless/myservice.zip"
+    "artifact": "/home/sylwia/go/src/github.com/Appliscale/cloud-security-audit/.serverless/cloud-security-audit.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/myservice/dev/1547744332780-2019-01-17T16:58:52.780Z",
-    "artifact": "myservice.zip"
+    "artifactDirectoryName": "serverless/cloud-security-audit/dev/1547745303942-2019-01-17T17:15:03.942Z",
+    "artifact": "cloud-security-audit.zip"
   }
 }
