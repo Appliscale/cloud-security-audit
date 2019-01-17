@@ -45,16 +45,14 @@ func (s3brs S3BucketReports) GetCsvReport() []byte {
 	csv := make([]string, 0)
 
 	for _, row := range s3brs {
-		rowStr := make([]string, 0)
-
 		s := strings.Join([]string{
 			row.Name,
-			string(row.EncryptionType),
+			strconv.FormatInt(int64(row.EncryptionType), 10),
 			strconv.FormatBool(row.LoggingEnabled),
 			row.ACLIsPublic,
 			row.PolicyIsPublic}, externalSep)
 
-		rowStr = append(rowStr, s)
+		csv = append(csv, s)
 	}
 
 	return []byte(strings.Join(csv, "\n"))
