@@ -1,13 +1,13 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/Appliscale/cloud-security-audit/configuration"
 	"github.com/Appliscale/cloud-security-audit/csasession"
 	"github.com/Appliscale/cloud-security-audit/resource"
 
-	"github.com/Appliscale/cloud-security-audit/environment"
 	"github.com/Appliscale/cloud-security-audit/scanner"
 	"github.com/spf13/cobra"
 )
@@ -21,12 +21,23 @@ var rootCmd = &cobra.Command{
 	Short: "Scan for vulnerabilities in your AWS Account.",
 	Long:  `Scan for vulnerabilities in your AWS Account.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if environment.CheckAWSConfigFiles(&config) {
-			err := scanner.Run(&config)
-			if err != nil {
-				config.Logger.Error(err.Error())
-			}
+		// if environment.CheckAWSConfigFiles(&config) {
+
+		if env, ok := os.LookupEnv("AWS_ACCESS_KEY_ID"); ok {
+			fmt.Println(env)
 		}
+		if env, ok := os.LookupEnv("AWS_SECRET_ACCESS_KEY"); ok {
+			fmt.Println(env)
+		}
+		if env, ok := os.LookupEnv("AWS_SESSION_TOKEN"); ok {
+			fmt.Println(env)
+		}
+		err := scanner.Run(&config)
+		if err != nil {
+			config.Logger.Error(err.Error())
+		}
+
+		// }
 	},
 }
 
