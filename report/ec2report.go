@@ -41,13 +41,40 @@ func (e Ec2Reports) GetJsonReport() ([]byte, error) {
 	return json.Marshal(e)
 }
 
-//func (e Ec2Reports) GetCsvReport() ([]byte, error) {
-//	output := make([]byte, 0)
-//
-//	for _, row := range e {
-//
-//	}
-//}
+func (e Ec2Reports) GetCsvReport() ([]byte, error) {
+	output := make([]byte, 0)
+
+	for _, row := range e {
+		for _, i := range *row.VolumeReport {
+			output = append(output, []byte(i)...)
+			output = append(output, ';')
+		}
+
+		output = append(output, ',')
+		output = append(output, []byte(row.InstanceID)...)
+		output = append(output, ',')
+
+		for tag, val := range row.SortableTags.Tags {
+			output = append(output, []byte(tag)...)
+			output = append(output, ';')
+			output = append(output, []byte(val)...)
+			output = append(output, ';')
+		}
+
+		output = append(output, ',')
+
+		for _, i := range row.SecurityGroupsIDs {
+			output = append(output, []byte(i)...)
+			output = append(output, ';')
+		}
+
+		output = append(output, ',')
+		output = append(output, []byte(row.AvailabilityZone)...)
+		output = append(output, '\n')
+	}
+
+	return output, nil
+}
 
 func (e *Ec2Reports) GetHeaders() []string {
 	return []string{"Availability\nZone", "EC2", "Volumes\n(None) - not encrypted\n(DKMS) - encrypted with default KMSKey", "Security\nGroups\n(Incoming CIDR = 0\x2E0\x2E0\x2E0/0)\nID : PROTOCOL : PORT", "EC2 Tags"}

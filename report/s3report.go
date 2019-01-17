@@ -2,6 +2,7 @@ package report
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -31,6 +32,18 @@ type S3ReportRequiredResources struct {
 
 func (s3brs S3BucketReports) GetJsonReport() ([]byte, error) {
 	return json.Marshal(s3brs)
+}
+
+func (s3brs S3BucketReports) GetCsvReport() ([]byte, error) {
+	output := make([]byte, 0)
+
+	for _, row := range s3brs {
+		s := fmt.Sprintf("%s,%s,%t,%s,%s\n", row.Name, row.EncryptionType, row.LoggingEnabled, row.ACLIsPublic,
+			row.PolicyIsPublic)
+		output = append(output, []byte(s)...)
+	}
+
+	return output, nil
 }
 
 // CheckEncryptionType : Returns Encryption Type (AES256, CKMS, DKMS, NONE)
