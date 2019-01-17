@@ -11,7 +11,7 @@ type Report interface {
 	FormatDataToTable() [][]string
 	GetTableHeaders() []string
 	GetJsonReport() []byte
-	//GetHtmlReport()
+	GetHtmlReport() []byte
 	GetCsvReport() []byte
 }
 
@@ -21,6 +21,7 @@ func PrintJsonReport(r Report) {
 
 func PrintHtmlReport(r Report) {
 	//	TODO:
+	//r.GetHtmlReport()
 }
 
 func PrintCSVReport(r Report) {

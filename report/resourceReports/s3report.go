@@ -39,6 +39,12 @@ func (s3brs S3BucketReports) GetJsonReport() []byte {
 	return []byte{}
 }
 
+func (s3brs S3BucketReports) GetHtmlReport() []byte {
+	data := s3brs.GetJsonReport()
+
+	return data
+}
+
 func (s3brs S3BucketReports) GetCsvReport() []byte {
 	const externalSep = ","
 

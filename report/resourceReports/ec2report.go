@@ -8,6 +8,9 @@ import (
 	"github.com/Appliscale/cloud-security-audit/environment"
 	"github.com/Appliscale/cloud-security-audit/report"
 	"github.com/Appliscale/cloud-security-audit/resource"
+	"text/template"
+	"io/ioutil"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -46,6 +49,32 @@ func (e Ec2Reports) GetJsonReport() []byte {
 	}
 
 	return []byte{}
+}
+
+func (e Ec2Reports) GetHtmlReport() []byte {
+	data := e.GetJsonReport()
+
+	reportTemplate, err := ioutil.ReadFile("./report_template.html")
+	if err != nil {
+		fmt.Println("cannot read template file")
+	}
+
+	tmpl, err := template.New("report_template").Parse(string(reportTemplate))
+	if err != nil {
+		fmt.Println("cannot parse template")
+	}
+
+	outputFile, err := os.OpenFile("./ec2.html", os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0777)
+	if err != nil {
+		fmt.Println("cannot open output file")
+	}
+
+	err = tmpl.Execute(outputFile, map[string]string{"name": "ec2", "data": string(data)})
+	if err != nil {
+		fmt.Println("cannot execute template")
+	}
+
+	return data
 }
 
 func (e Ec2Reports) GetCsvReport() []byte {
