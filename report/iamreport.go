@@ -16,7 +16,7 @@ func NewIAMReport(userName string) *IAMReport {
 type IAMReports []*IAMReport
 
 type IAMReportRequiredResources struct {
-	Users *resource.Users
+	IAMInfo *resource.IAMInfo
 }
 
 func (i *IAMReports) GetHeaders() []string {
@@ -35,20 +35,21 @@ func (i *IAMReports) FormatDataToTable() [][]string {
 }
 
 func (i *IAMReports) GenerateReport(r *IAMReportRequiredResources) {
-	for _, user := range *r.Users {
+	for _, user := range (*r.IAMInfo).GetUsers() {
 		iamReport := NewIAMReport(*user.UserName)
 		*i = append(*i, iamReport)
 	}
+
 }
 
 func (i *IAMReports) GetResources(config *configuration.Config) (*IAMReportRequiredResources, error) {
-	resources := &IAMReportRequiredResources{Users: &resource.Users{}}
+	resources := &IAMReportRequiredResources{IAMInfo: &resource.IAMInfo{}}
 
 	for _, region := range *config.Regions {
 		err := resource.LoadResources(
 			config,
 			region,
-			resources.Users,
+			resources.IAMInfo,
 		)
 
 		if err != nil {

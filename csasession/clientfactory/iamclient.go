@@ -6,6 +6,7 @@ import (
 
 type IAMClient interface {
 	ListUsers(input *iam.ListUsersInput) (*iam.ListUsersOutput, error)
+	ListAccessKeys(input *iam.ListAccessKeysInput) (*iam.ListAccessKeysOutput, error)
 }
 
 type AWSIAMClient struct {
@@ -14,4 +15,8 @@ type AWSIAMClient struct {
 
 func (client AWSIAMClient) ListUsers(input *iam.ListUsersInput) (*iam.ListUsersOutput, error) {
 	return client.api.ListUsers(input)
+}
+
+func (client AWSIAMClient) ListAccessKeys(input *iam.ListAccessKeysInput) (*iam.ListAccessKeysOutput, error) {
+	return client.api.ListAccessKeys(input)
 }

@@ -9,7 +9,20 @@ import (
 
 type Users []*iam.User
 
-func (u *Users) LoadFromAWS(config *configuration.Config, region string) error {
+type IAMInfo struct {
+	hasRootAccessKeys bool
+	users             Users
+}
+
+func (iaminfo IAMInfo) GetUsers() Users {
+	return iaminfo.users
+}
+
+func (iaminfo IAMInfo) HasRootAccessKeys() bool {
+	return iaminfo.hasRootAccessKeys
+}
+
+func (iaminfo *IAMInfo) LoadFromAWS(config *configuration.Config, region string) error {
 	iamAPI, err := config.ClientFactory.GetIAMClient(csasession.SessionConfig{Profile: config.Profile, Region: region})
 	if err != nil {
 		return err
@@ -17,7 +30,17 @@ func (u *Users) LoadFromAWS(config *configuration.Config, region string) error {
 
 	q := &iam.ListUsersInput{}
 
+	// get Users
 	result, err := iamAPI.ListUsers(q)
+	CheckError(region, config, err)
+	(*iaminfo).users = result.Users
+
+	//get access keys for root
+
+	return nil
+}
+
+func CheckError(region string, config *configuration.Config, err error) error {
 	if err != nil {
 		if aerr, ok := err.(awserr.Error); ok {
 			switch aerr.Code() {
@@ -31,7 +54,5 @@ func (u *Users) LoadFromAWS(config *configuration.Config, region string) error {
 			return err
 		}
 	}
-
-	*u = result.Users
 	return nil
 }
