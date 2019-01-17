@@ -44,5 +44,17 @@ func (i *IAMReports) GenerateReport(r *IAMReportRequiredResources) {
 func (i *IAMReports) GetResources(config *configuration.Config) (*IAMReportRequiredResources, error) {
 	resources := &IAMReportRequiredResources{Users: &resource.Users{}}
 
+	for _, region := range *config.Regions {
+		err := resource.LoadResources(
+			config,
+			region,
+			resources.Users,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return resources, nil
 }
