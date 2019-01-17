@@ -2,6 +2,7 @@ package report
 
 import (
 	"bytes"
+	"encoding/json"
 	"github.com/Appliscale/cloud-security-audit/configuration"
 	"github.com/Appliscale/cloud-security-audit/environment"
 	"github.com/Appliscale/cloud-security-audit/resource"
@@ -11,11 +12,11 @@ import (
 )
 
 type Ec2Report struct {
-	VolumeReport      *VolumeReport
-	InstanceID        string
-	SortableTags      *SortableTags
-	SecurityGroupsIDs []string
-	AvailabilityZone  string
+	VolumeReport      *VolumeReport	`json:"volume_report"`
+	InstanceID        string		`json:"instance_id"`
+	SortableTags      *SortableTags	`json:"sortable_tags"`
+	SecurityGroupsIDs []string		`json:"security_groups_ids"`
+	AvailabilityZone  string		`json:"availability_zone"`
 }
 
 func NewEc2Report(instanceID string) *Ec2Report {
@@ -35,6 +36,18 @@ type Ec2ReportRequiredResources struct {
 	SecurityGroups   *resource.SecurityGroups
 	AvailabilityZone string
 }
+
+func (e Ec2Reports) GetJsonReport() ([]byte, error) {
+	return json.Marshal(e)
+}
+
+//func (e Ec2Reports) GetCsvReport() ([]byte, error) {
+//	output := make([]byte, 0)
+//
+//	for _, row := range e {
+//
+//	}
+//}
 
 func (e *Ec2Reports) GetHeaders() []string {
 	return []string{"Availability\nZone", "EC2", "Volumes\n(None) - not encrypted\n(DKMS) - encrypted with default KMSKey", "Security\nGroups\n(Incoming CIDR = 0\x2E0\x2E0\x2E0/0)\nID : PROTOCOL : PORT", "EC2 Tags"}

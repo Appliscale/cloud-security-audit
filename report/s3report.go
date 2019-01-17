@@ -1,6 +1,7 @@
 package report
 
 import (
+	"encoding/json"
 	"strconv"
 	"strings"
 
@@ -14,11 +15,11 @@ const effect = "Effect"
 const principal = "Principal"
 
 type S3BucketReport struct {
-	Name string
-	EncryptionType
-	LoggingEnabled bool
-	ACLIsPublic    string
-	PolicyIsPublic string
+	Name string				`json:"name"`
+	EncryptionType			`json:"encryption_type"`
+	LoggingEnabled bool		`json:"logging_enabled"`
+	ACLIsPublic    string	`json:"acl_is_public"`
+	PolicyIsPublic string	`json:"policy_is_public"`
 }
 
 type S3BucketReports []*S3BucketReport
@@ -26,6 +27,10 @@ type S3BucketReports []*S3BucketReport
 type S3ReportRequiredResources struct {
 	KMSKeys   *resource.KMSKeys
 	S3Buckets *resource.S3Buckets
+}
+
+func (s3brs S3BucketReports) GetJsonReport() ([]byte, error) {
+	return json.Marshal(s3brs)
 }
 
 // CheckEncryptionType : Returns Encryption Type (AES256, CKMS, DKMS, NONE)
