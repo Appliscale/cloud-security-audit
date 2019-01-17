@@ -39,6 +39,11 @@ func Run(config *configuration.Config) error {
 			}
 			iamReports.GenerateReport(resources)
 			report.PrintTable(&iamReports)
+
+			iamChecklist := report.IAMChecklist{}
+			iamChecklist.GenerateReport(resources)
+			report.PrintTable(&iamChecklist)
+
 		default:
 			return fmt.Errorf("Wrong service name: %s", service)
 		}
