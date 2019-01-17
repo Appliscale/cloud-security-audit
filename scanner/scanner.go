@@ -20,7 +20,7 @@ func Run(config *configuration.Config) error {
 				return err
 			}
 			ec2Reports.GenerateReport(resources)
-			report.PrintTable(&ec2Reports)
+			config.PrintFormat(&ec2Reports)
 		case "s3":
 			config.Logger.Info("Gathering information about S3s...")
 			s3BucketReports := report.S3BucketReports{}
@@ -29,7 +29,7 @@ func Run(config *configuration.Config) error {
 				return err
 			}
 			s3BucketReports.GenerateReport(resources)
-			report.PrintTable(&s3BucketReports)
+			config.PrintFormat(&s3BucketReports)
 		default:
 			return fmt.Errorf("Wrong service name: %s", service)
 		}

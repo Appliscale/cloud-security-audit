@@ -76,7 +76,7 @@ func (e Ec2Reports) GetCsvReport() ([]byte, error) {
 	return output, nil
 }
 
-func (e *Ec2Reports) GetHeaders() []string {
+func (e *Ec2Reports) GetTableHeaders() []string {
 	return []string{"Availability\nZone", "EC2", "Volumes\n(None) - not encrypted\n(DKMS) - encrypted with default KMSKey", "Security\nGroups\n(Incoming CIDR = 0\x2E0\x2E0\x2E0/0)\nID : PROTOCOL : PORT", "EC2 Tags"}
 }
 
