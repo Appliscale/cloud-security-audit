@@ -16,21 +16,22 @@ func (u *Users) LoadFromAWS(config *configuration.Config, region string) error {
 	}
 
 	q := &iam.ListUsersInput{}
-	for {
-		result, err := iamAPI.ListUsers(q)
-		if err != nil {
-			if aerr, ok := err.(awserr.Error); ok {
-				switch aerr.Code() {
-				case "OptInRequired":
-					config.Logger.Warning("you are not subscribed to the IAM service in region: " + region)
-					break
-				default:
-					return err
-				}
-			} else {
+
+	result, err := iamAPI.ListUsers(q)
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case "OptInRequired":
+				config.Logger.Warning("you are not subscribed to the IAM service in region: " + region)
+				break
+			default:
 				return err
 			}
+		} else {
+			return err
 		}
-		*u = result.Users
 	}
+
+	*u = result.Users
+	return nil
 }
