@@ -5,17 +5,21 @@ import (
 	"github.com/Appliscale/cloud-security-audit/configuration"
 	"github.com/Appliscale/cloud-security-audit/resource"
 	"github.com/aws/aws-sdk-go/service/iam"
+	"strings"
 )
 
 type IAMReport struct {
 	UserName       string
+	Groups         string
 	InlinePolicies int
 }
 
 func NewIAMReport(u iam.UserDetail) *IAMReport {
+
 	return &IAMReport{
-		*u.UserName,
-		len(u.UserPolicyList),
+		getUserName(u),
+		getUserGroups(u),
+		getNoOfUserInlinePolicies(u),
 	}
 }
 
@@ -26,7 +30,7 @@ type IAMReportRequiredResources struct {
 }
 
 func (i *IAMReports) GetHeaders() []string {
-	return []string{"User name", "Inline policies"}
+	return []string{"User name", "Groups", "# of Inline\npolicies"}
 }
 
 func (i *IAMReports) FormatDataToTable() [][]string {
@@ -35,6 +39,7 @@ func (i *IAMReports) FormatDataToTable() [][]string {
 	for _, iamReport := range *i {
 		row := []string{
 			iamReport.UserName,
+			iamReport.Groups,
 			fmt.Sprintf("%d", iamReport.InlinePolicies),
 		}
 		data = append(data, row)
@@ -67,4 +72,29 @@ func (i *IAMReports) GetResources(config *configuration.Config) (*IAMReportRequi
 	}
 
 	return resources, nil
+}
+
+func getUserName(u iam.UserDetail) string {
+	return *u.UserName
+}
+
+func getUserGroups(u iam.UserDetail) string {
+	var grouplist []string
+	if len(u.GroupList) != 0 {
+		for _, group := range u.GroupList {
+			grouplist = append(grouplist, *group)
+		}
+	}
+
+	groups := "None"
+
+	if len(grouplist) > 0 {
+		groups = strings.Join(grouplist, ",")
+	}
+
+	return groups
+}
+
+func getNoOfUserInlinePolicies(u iam.UserDetail) int {
+	return len(u.UserPolicyList)
 }

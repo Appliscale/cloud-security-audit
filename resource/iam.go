@@ -34,7 +34,6 @@ func (iaminfo *IAMInfo) LoadFromAWS(config *configuration.Config, region string)
 	result, err := iamAPI.ListUsers(q)
 	CheckError(region, config, err)
 	(*iaminfo).users = result.UserDetailList
-	//get access keys for root
 
 	return nil
 }
