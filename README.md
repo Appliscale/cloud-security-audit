@@ -16,7 +16,7 @@ $GOPATH $ go get github.com/Appliscale/cloud-security-audit
 $GOPATH $ cd cloud-security-audit
 ```
 
-Then build and install configuration for the application inside clous-security-audit directory by executing:
+Then build and install configuration for the application inside cloud-security-audit directory by executing:
 
 ```bash
 cloud-security-audit $ make all
