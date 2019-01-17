@@ -31,11 +31,12 @@ type S3ReportRequiredResources struct {
 	S3Buckets *resource.S3Buckets
 }
 
-func (s3brs S3BucketReports) GetJsonReport() ([]byte, error) {
-	return json.Marshal(s3brs)
+func (s3brs S3BucketReports) GetJsonReport() []byte {
+	msg, _ := json.Marshal(s3brs)
+	return msg
 }
 
-func (s3brs S3BucketReports) GetCsvReport() ([]byte, error) {
+func (s3brs S3BucketReports) GetCsvReport() []byte {
 	output := make([]byte, 0)
 
 	for _, row := range s3brs {
@@ -44,7 +45,7 @@ func (s3brs S3BucketReports) GetCsvReport() ([]byte, error) {
 		output = append(output, []byte(s)...)
 	}
 
-	return output, nil
+	return output
 }
 
 // CheckEncryptionType : Returns Encryption Type (AES256, CKMS, DKMS, NONE)

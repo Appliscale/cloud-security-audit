@@ -10,18 +10,13 @@ import (
 type Report interface {
 	FormatDataToTable() [][]string
 	GetTableHeaders() []string
-	GetJsonReport() ([]byte, error)
+	GetJsonReport() []byte
 	//GetHtmlReport()
-	GetCsvReport() ([]byte, error)
+	GetCsvReport() []byte
 }
 
 func PrintJsonReport(r Report) {
-	msg, err := r.GetJsonReport()
-	if err == nil {
-		fmt.Println(string(msg))
-	} else {
-		//	TODO: ERROR
-	}
+	fmt.Println(string(r.GetJsonReport()))
 }
 
 func PrintHtmlReport(r Report) {
@@ -29,12 +24,7 @@ func PrintHtmlReport(r Report) {
 }
 
 func PrintCSVReport(r Report) {
-	msg, err := r.GetCsvReport()
-	if err == nil {
-		fmt.Println(string(msg))
-	} else {
-		//	TODO: ERROR
-	}
+	fmt.Println(string(r.GetCsvReport()))
 }
 
 func PrintTable(r Report) {

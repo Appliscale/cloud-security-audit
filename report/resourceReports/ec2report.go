@@ -38,11 +38,12 @@ type Ec2ReportRequiredResources struct {
 	AvailabilityZone string
 }
 
-func (e Ec2Reports) GetJsonReport() ([]byte, error) {
-	return json.Marshal(e)
+func (e Ec2Reports) GetJsonReport() []byte {
+	msg, _ := json.Marshal(e)
+	return msg
 }
 
-func (e Ec2Reports) GetCsvReport() ([]byte, error) {
+func (e Ec2Reports) GetCsvReport() []byte {
 	output := make([]byte, 0)
 
 	for _, row := range e {
@@ -74,7 +75,7 @@ func (e Ec2Reports) GetCsvReport() ([]byte, error) {
 		output = append(output, '\n')
 	}
 
-	return output, nil
+	return output
 }
 
 func (e *Ec2Reports) GetTableHeaders() []string {
