@@ -1,7 +1,6 @@
 package report
 
 import (
-	"fmt"
 	"github.com/olekukonko/tablewriter"
 	"os"
 	"strings"
@@ -15,24 +14,33 @@ type Report interface {
 	GetCsvReport() []byte
 }
 
-func PrintJsonReport(r Report) {
-	fmt.Println(string(r.GetJsonReport()))
+func handleOutput(output []byte, file *os.File) {
+	out := append(output, []byte("\n\n")...)
+	_, err := file.Write(out)
+	if err != nil {
+		panic(err)
+	}
+	file.Sync()
 }
 
-func PrintHtmlReport(r Report) {
+func PrintJsonReport(r Report, filename *os.File) {
+	handleOutput(r.GetJsonReport(), filename)
+}
+
+func PrintHtmlReport(r Report, filename *os.File) {
 	//	TODO:
 	//r.GetHtmlReport()
 }
 
-func PrintCSVReport(r Report) {
-	fmt.Println(string(r.GetCsvReport()))
+func PrintCSVReport(r Report, filename *os.File) {
+	handleOutput(r.GetCsvReport(), filename)
 }
 
-func PrintTable(r Report) {
+func PrintTable(r Report, file *os.File) {
 
 	data := r.FormatDataToTable()
 
-	table := tablewriter.NewWriter(os.Stdout)
+	table := tablewriter.NewWriter(file)
 	// Configure Headers
 	table.SetReflowDuringAutoWrap(false)
 	table.SetAutoFormatHeaders(false)

@@ -81,7 +81,13 @@ func (e Ec2Reports) GetCsvReport() []byte {
 	const internalSep = ";"
 	const externalSep = ","
 
-	csv := make([]string, 0)
+	csv := []string{strings.Join([]string{
+		"\"Availability Zone\"",
+		"\"EC2\"",
+		"\"Volumes encrypton\"",
+		"\"Open Security Groups\"",
+		"\"EC2 Tags\"",
+	}, externalSep)}
 
 	for _, row := range e {
 		rowStr := make([]string, 0)

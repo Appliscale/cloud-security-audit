@@ -48,7 +48,12 @@ func (s3brs S3BucketReports) GetHtmlReport() []byte {
 func (s3brs S3BucketReports) GetCsvReport() []byte {
 	const externalSep = ","
 
-	csv := make([]string, 0)
+	csv := []string{strings.Join([]string{
+		"\"Bucket Name\"",
+		"\"Default SSE\"",
+		"\"Logging Enabled\"",
+		"\"ACL public permission\"",
+		"\"Policy public permissions\"",}, externalSep)}
 
 	for _, row := range s3brs {
 		s := strings.Join([]string{

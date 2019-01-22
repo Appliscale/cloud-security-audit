@@ -6,9 +6,13 @@ import (
 
 	"github.com/Appliscale/cloud-security-audit/configuration"
 	"github.com/Appliscale/cloud-security-audit/report/resourceReports"
+	"os"
 )
 
 func Run(config *configuration.Config) error {
+	if config.OutputFile != os.Stdout {
+		defer config.OutputFile.Close()
+	}
 
 	for _, service := range *config.Services {
 		switch strings.ToLower(service) {
@@ -20,7 +24,7 @@ func Run(config *configuration.Config) error {
 				return err
 			}
 			ec2Reports.GenerateReport(resources)
-			config.PrintFormat(&ec2Reports)
+			config.PrintFormat(&ec2Reports, config.OutputFile)
 		case "s3":
 			config.Logger.Info("Gathering information about S3s...")
 			s3BucketReports := resourceReports.S3BucketReports{}
@@ -29,7 +33,7 @@ func Run(config *configuration.Config) error {
 				return err
 			}
 			s3BucketReports.GenerateReport(resources)
-			config.PrintFormat(&s3BucketReports)
+			config.PrintFormat(&s3BucketReports, config.OutputFile)
 		default:
 			return fmt.Errorf("Wrong service name: %s", service)
 		}
