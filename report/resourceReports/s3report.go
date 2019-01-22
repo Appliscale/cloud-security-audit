@@ -9,6 +9,7 @@ import (
 	"github.com/Appliscale/cloud-security-audit/report"
 	"github.com/Appliscale/cloud-security-audit/resource"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"os"
 )
 
 const action = "Action"
@@ -35,13 +36,14 @@ func (s3brs S3BucketReports) GetJsonReport() []byte {
 	if err == nil {
 		return output
 	}
-
+	report.ReportLogger.Error("Error generating Json report")
+	os.Exit(1)
 	return []byte{}
 }
 
-func (s3brs S3BucketReports) GetHtmlReport() []byte {
+func (s3brs S3BucketReports) PrintHtmlReport(outputFile *os.File) []byte {
 	data := s3brs.GetJsonReport()
-
+	//TODO:
 	return data
 }
 
@@ -53,7 +55,7 @@ func (s3brs S3BucketReports) GetCsvReport() []byte {
 		"\"Default SSE\"",
 		"\"Logging Enabled\"",
 		"\"ACL public permission\"",
-		"\"Policy public permissions\"",}, externalSep)}
+		"\"Policy public permissions\""}, externalSep)}
 
 	for _, row := range s3brs {
 		s := strings.Join([]string{

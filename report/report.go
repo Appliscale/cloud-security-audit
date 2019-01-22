@@ -1,16 +1,19 @@
 package report
 
 import (
+	"github.com/Appliscale/cloud-security-audit/logger"
 	"github.com/olekukonko/tablewriter"
 	"os"
 	"strings"
 )
 
+var ReportLogger = logger.CreateDefaultLogger()
+
 type Report interface {
 	FormatDataToTable() [][]string
 	GetTableHeaders() []string
 	GetJsonReport() []byte
-	GetHtmlReport() []byte
+	PrintHtmlReport(*os.File) []byte
 	GetCsvReport() []byte
 }
 
@@ -28,8 +31,7 @@ func PrintJsonReport(r Report, filename *os.File) {
 }
 
 func PrintHtmlReport(r Report, filename *os.File) {
-	//	TODO:
-	//r.GetHtmlReport()
+	r.PrintHtmlReport(filename)
 }
 
 func PrintCSVReport(r Report, filename *os.File) {
