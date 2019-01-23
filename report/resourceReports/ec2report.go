@@ -12,7 +12,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"text/template"
+	"html/template"
 )
 
 type Ec2Report struct {
