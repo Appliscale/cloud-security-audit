@@ -8,7 +8,6 @@ import (
 	"github.com/Appliscale/cloud-security-audit/environment"
 	"github.com/Appliscale/cloud-security-audit/report"
 	"github.com/Appliscale/cloud-security-audit/resource"
-	"io/ioutil"
 	"os"
 	"sort"
 	"strconv"
@@ -52,26 +51,21 @@ func (e Ec2Reports) GetJsonReport() []byte {
 	return []byte{}
 }
 
-func (e Ec2Reports) PrintHtmlReport(outputFile *os.File) []byte {
+func (e Ec2Reports) PrintHtmlReport(outputFile *os.File) error {
 	data := e.GetJsonReport()
+	reportTemplate := GetHtmlTemplate()
 
-	//TODO: The template has to be downloaded from ex. S3 (this won't work when the user downloads a binary only) We can download it once and save in ~/.config/cloud-security-audit
-	reportTemplate, err := ioutil.ReadFile("./report_template.html")
+	tmpl, err := template.New("report_template").Parse(reportTemplate)
 	if err != nil {
-		report.ReportLogger.Error("cannot read template file")
+		report.ReportLogger.Error("Can not parse reportTemplate")
 	}
 
-	tmpl, err := template.New("report_template").Parse(string(reportTemplate))
+	err = tmpl.Execute(outputFile, map[string]string{"EC2_JSON_PLACEHOLDER": string(data)})
 	if err != nil {
-		report.ReportLogger.Error("cannot parse template")
+		report.ReportLogger.Error("Can not execute reportTemplate")
 	}
 
-	err = tmpl.Execute(outputFile, map[string]string{"name": "ec2", "data": string(data)})
-	if err != nil {
-		report.ReportLogger.Error("cannot execute template")
-	}
-
-	return data
+	return err
 }
 
 func (e Ec2Reports) GetCsvReport() []byte {

@@ -13,7 +13,7 @@ type Report interface {
 	FormatDataToTable() [][]string
 	GetTableHeaders() []string
 	GetJsonReport() []byte
-	PrintHtmlReport(*os.File) []byte
+	PrintHtmlReport(*os.File) error
 	GetCsvReport() []byte
 }
 

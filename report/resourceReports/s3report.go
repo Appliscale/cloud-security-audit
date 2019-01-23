@@ -2,6 +2,7 @@ package resourceReports
 
 import (
 	"encoding/json"
+	"html/template"
 	"strconv"
 	"strings"
 
@@ -41,10 +42,21 @@ func (s3brs S3BucketReports) GetJsonReport() []byte {
 	return []byte{}
 }
 
-func (s3brs S3BucketReports) PrintHtmlReport(outputFile *os.File) []byte {
+func (s3brs S3BucketReports) PrintHtmlReport(outputFile *os.File) error {
 	data := s3brs.GetJsonReport()
-	//TODO:
-	return data
+	reportTemplate := GetHtmlTemplate()
+
+	tmpl, err := template.New("report_template").Parse(reportTemplate)
+	if err != nil {
+		report.ReportLogger.Error("Can not parse reportTemplate")
+	}
+
+	err = tmpl.Execute(outputFile, map[string]string{"S3_JSON_PLACEHOLDER": string(data)})
+	if err != nil {
+		report.ReportLogger.Error("Can not execute reportTemplate")
+	}
+
+	return err
 }
 
 func (s3brs S3BucketReports) GetCsvReport() []byte {
