@@ -98,7 +98,7 @@ func GetHtmlTemplate() string {
 		      document.body.appendChild(table);
 		    }
 		
-		    var services = [{ name: "EC2", report: JSON.parse(ec2) }, { name: "S3", report: JSON.parse(s3) }];
+		    var services = [{ name: "EC2", report: ec2 && JSON.parse(ec2) }, { name: "S3", report: s3 && JSON.parse(s3) }];
 		
 		    services.forEach(function(service) {
 		      if (service.name && service.report && Array.isArray(service.report)) {
