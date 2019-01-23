@@ -1,0 +1,107 @@
+
+		<!DOCTYPE html>
+		<html>
+		  <head>
+		    <style>
+		      table,
+		      th,
+		      td {
+		        border: 1px solid black;
+		      }
+		    </style>
+		  </head>
+		  <body></body>
+		  <script>
+		    var ec2 = "[{\"volume_report\":[\"vol-0476bb7e1197d3a66[NONE]\"],\"instance_id\":\"i-090b08d752e8b2ad1\",\"sortable_tags\":{\"Tags\":{\"Name\":\"aws-cloud9-Deltax-7b796eb369d944bfa12ea683d3600768\",\"aws:cloud9:environment\":\"7b796eb369d944bfa12ea683d3600768\",\"aws:cloud9:owner\":\"AIDAI4LKVJUCWQWQB72TW\",\"aws:cloudformation:logical-id\":\"Instance\",\"aws:cloudformation:stack-id\":\"arn:aws:cloudformation:us-east-2:428053034657:stack/aws-cloud9-Deltax-7b796eb369d944bfa12ea683d3600768/da82f550-edb1-11e8-ae97-0a975bd0f342\",\"aws:cloudformation:stack-name\":\"aws-cloud9-Deltax-7b796eb369d944bfa12ea683d3600768\"},\"Keys\":[\"aws:cloud9:environment\",\"aws:cloud9:owner\",\"aws:cloudformation:logical-id\",\"aws:cloudformation:stack-id\",\"aws:cloudformation:stack-name\",\"Name\"]},\"security_groups_ids\":null,\"availability_zone\":\"us-east-2a\"},{\"volume_report\":[\"vol-00fa16729aab7f720[NONE]\"],\"instance_id\":\"i-01f76ecd109b58b15\",\"sortable_tags\":{\"Tags\":{},\"Keys\":null},\"security_groups_ids\":[\"sg-0fb20446123af6a06 : tcp : 22\"],\"availability_zone\":\"us-east-1c\"},{\"volume_report\":[\"vol-0ca830b760613f74b[NONE]\"],\"instance_id\":\"i-015acb3b553f369c2\",\"sortable_tags\":{\"Tags\":{\"Name\":\"bonus-engine-gatling-m3.large\"},\"Keys\":[\"Name\"]},\"security_groups_ids\":[\"sg-2491c349 : tcp : 22\"],\"availability_zone\":\"eu-central-1a\"},{\"volume_report\":[\"vol-059aeede322dfe30d[NONE]\"],\"instance_id\":\"i-006cbe7c9fd563b22\",\"sortable_tags\":{\"Tags\":{\"Name\":\"bonus-engine-management-api-m3.xlarge\"},\"Keys\":[\"Name\"]},\"security_groups_ids\":[\"sg-2491c349 : tcp : 22\"],\"availability_zone\":\"eu-central-1b\"},{\"volume_report\":[\"vol-04aab871e3164f6ea[NONE]\"],\"instance_id\":\"i-093c7f46db2c025fb\",\"sortable_tags\":{\"Tags\":{\"Name\":\"deltat-staging-2016Express\"},\"Keys\":[\"Name\"]},\"security_groups_ids\":[\"sg-0e318a21639c61262 : tcp : 80\",\"sg-0e318a21639c61262 : tcp : 3389\"],\"availability_zone\":\"eu-central-1b\"},{\"volume_report\":[\"vol-01b7d4f0ef0189293[NONE]\"],\"instance_id\":\"i-0ad38af4a40aef19a\",\"sortable_tags\":{\"Tags\":{\"Name\":\"bonus-engine-gatling-m3.xlarge\"},\"Keys\":[\"Name\"]},\"security_groups_ids\":[\"sg-2491c349 : tcp : 22\"],\"availability_zone\":\"eu-central-1a\"},{\"volume_report\":[\"vol-0a31fb6cb209bde09[NONE]\"],\"instance_id\":\"i-03ab3e779aaa83ff3\",\"sortable_tags\":{\"Tags\":{\"Name\":\"deltat-staging-2012Standard\"},\"Keys\":[\"Name\"]},\"security_groups_ids\":[\"sg-019ca0da8e394203a : tcp : 80\",\"sg-019ca0da8e394203a : tcp : 3389\"],\"availability_zone\":\"eu-central-1b\"},{\"volume_report\":[\"vol-0a6b4990963babe43[NONE]\"],\"instance_id\":\"i-0a1baff59d6a582e0\",\"sortable_tags\":{\"Tags\":{\"Name\":\"deltat-prod\"},\"Keys\":[\"Name\"]},\"security_groups_ids\":[\"sg-5ba62d36 : tcp : 81\",\"sg-5ba62d36 : tcp : 22\",\"sg-5ba62d36 : tcp : 50501\",\"sg-5ba62d36 : tcp : 3389\",\"sg-5ba62d36 : tcp : 443\"],\"availability_zone\":\"eu-central-1b\"},{\"volume_report\":[\"vol-0dc36dff415ca0ffa[NONE]\"],\"instance_id\":\"i-05b244fd18a97e9b9\",\"sortable_tags\":{\"Tags\":{\"Name\":\"deltat-dev\",\"name\":\"deltat-dev\"},\"Keys\":[\"Name\",\"name\"]},\"security_groups_ids\":[\"sg-5ba62d36 : tcp : 81\",\"sg-5ba62d36 : tcp : 22\",\"sg-5ba62d36 : tcp : 50501\",\"sg-5ba62d36 : tcp : 3389\",\"sg-5ba62d36 : tcp : 443\"],\"availability_zone\":\"eu-central-1c\"},{\"volume_report\":[\"vol-04e04ab1d14fdbac1[NONE]\"],\"instance_id\":\"i-01e25027f5e7d72e9\",\"sortable_tags\":{\"Tags\":{\"Name\":\"bonus-engine-ingestion-2core-m3.xlarge\"},\"Keys\":[\"Name\"]},\"security_groups_ids\":[\"sg-2491c349 : tcp : 22\"],\"availability_zone\":\"eu-central-1a\"},{\"volume_report\":[\"vol-0d364207fd1b90fee[NONE]\"],\"instance_id\":\"i-05756c04f672a605d\",\"sortable_tags\":{\"Tags\":{\"Name\":\"deltat-t-test\"},\"Keys\":[\"Name\"]},\"security_groups_ids\":[\"sg-0d12b14146ed0324a : tcp : 3389\"],\"availability_zone\":\"eu-west-1c\"},{\"volume_report\":[\"vol-01976053cd1285d3e[NONE]\"],\"instance_id\":\"i-0a1b18bbcc237cee4\",\"sortable_tags\":{\"Tags\":{\"Name\":\"aws-cloud9-Whiterock-ec9d0afacd1c4dd8b7b5bef33dadbdd7\",\"aws:cloud9:environment\":\"ec9d0afacd1c4dd8b7b5bef33dadbdd7\",\"aws:cloud9:owner\":\"AIDAI4LKVJUCWQWQB72TW\",\"aws:cloudformation:logical-id\":\"Instance\",\"aws:cloudformation:stack-id\":\"arn:aws:cloudformation:eu-west-1:428053034657:stack/aws-cloud9-Whiterock-ec9d0afacd1c4dd8b7b5bef33dadbdd7/58392ff0-815b-11e8-9006-503abe701cfd\",\"aws:cloudformation:stack-name\":\"aws-cloud9-Whiterock-ec9d0afacd1c4dd8b7b5bef33dadbdd7\"},\"Keys\":[\"aws:cloud9:environment\",\"aws:cloud9:owner\",\"aws:cloudformation:logical-id\",\"aws:cloudformation:stack-id\",\"aws:cloudformation:stack-name\",\"Name\"]},\"security_groups_ids\":[\"sg-6ce41810 : tcp : 22\"],\"availability_zone\":\"eu-west-1b\"},{\"volume_report\":[\"vol-08056ac334f3ddff7[NONE]\"],\"instance_id\":\"i-07b61f216d8f75467\",\"sortable_tags\":{\"Tags\":{},\"Keys\":null},\"security_groups_ids\":[\"sg-acc078d0 : tcp : 22\"],\"availability_zone\":\"eu-west-1a\"},{\"volume_report\":[\"vol-0050425fb3597b823[NONE]\"],\"instance_id\":\"i-01c5554ebc0fdccf5\",\"sortable_tags\":{\"Tags\":{\"Name\":\"vo-build\"},\"Keys\":[\"Name\"]},\"security_groups_ids\":[\"sg-7998fc12 : tcp : 22\",\"sg-7998fc12 : tcp : 5000\"],\"availability_zone\":\"eu-west-2c\"}]"
+		    var s3 = undefined
+		   
+		    var HEADERS = {
+		      volume_report: "Volume report",
+		      instance_id: "Instance Id",
+		      sortable_tags: "Sortable tags",
+		      security_groups_ids: "Security groups ids",
+		      availability_zone: "Availability zone",
+		      name: "Bucket name",
+		      encryption_type: "Default SSE",
+		      logging_enabled: "Logging enabled",
+		      acl_is_public: "ACL is public",
+		      policy_is_public: "Policy is public"
+		    };
+		
+		    function createHeader(name) {
+		      document.body.appendChild(
+		        document.createElement("h1").appendChild(document.createTextNode(name))
+		      );
+		    }
+		
+		    function createHeadRow(report, table) {
+		      var tr = table.insertRow();
+		      for (key in report[0]) {
+		        var td = tr.insertCell();
+		        td.appendChild(document.createTextNode(HEADERS[key]));
+		      }
+		    }
+		
+		    function createSubtableFromArray(array) {
+		      var subtable = document.createElement("table");
+		      array.forEach(function(value) {
+		        var tr = subtable.insertRow();
+		        var td = tr.insertCell();
+		        td.appendChild(document.createTextNode(value));
+		      });
+		      return subtable;
+		    }
+		
+		    function createSubtableFromMap(map) {
+		      var subtable = document.createElement("table");
+		      for (key in map) {
+		        var tr = subtable.insertRow();
+		        var tdkey = tr.insertCell();
+		        tdkey.appendChild(document.createTextNode(key));
+		        var tdvalue = tr.insertCell();
+		        tdvalue.appendChild(document.createTextNode(map[key]));
+		      }
+		      return subtable;
+		    }
+		
+		    function rowCreate(record, table) {
+		      var tr = table.insertRow();
+		      for (key in record) {
+		        var td = tr.insertCell();
+		        var value = record[key];
+		        if (value !== undefined || value !== null) {
+		          if (Array.isArray(value)) {
+		            td.appendChild(createSubtableFromArray(value));
+		          } else if (value instanceof Object) {
+		            if (key === "sortable_tags") {
+		              td.appendChild(createSubtableFromMap(value.Tags));
+		            }
+		          } else {
+		            td.appendChild(document.createTextNode(record[key]));
+		          }
+		        } else {
+		          td.appendChild(document.createTextNode(""));
+		        }
+		      }
+		    }
+		
+		    function tableCreate(name, report) {
+		      createHeader(name);
+		      var table = document.createElement("table");
+		      createHeadRow(report, table);
+		      report.forEach(function(record) {
+		        rowCreate(record, table);
+		      });
+		      document.body.appendChild(table);
+		    }
+		
+		    var services = [{ name: "EC2", report: ec2 && JSON.parse(ec2) }, { name: "S3", report: s3 && JSON.parse(s3) }];
+		
+		    services.forEach(function(service) {
+		      if (service.name && service.report && Array.isArray(service.report)) {
+		        tableCreate(service.name, service.report);
+		      }
+		    });
+		  </script>
+		</html>
+	

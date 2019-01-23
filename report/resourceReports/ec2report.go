@@ -8,11 +8,11 @@ import (
 	"github.com/Appliscale/cloud-security-audit/environment"
 	"github.com/Appliscale/cloud-security-audit/report"
 	"github.com/Appliscale/cloud-security-audit/resource"
+	"html/template"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
-	"html/template"
 )
 
 type Ec2Report struct {
