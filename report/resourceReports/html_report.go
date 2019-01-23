@@ -15,8 +15,8 @@ func GetHtmlTemplate() string {
 		  </head>
 		  <body></body>
 		  <script>
-		    var ec2 = {{ if .EC2_JSON_PLACEHOLDER }} {{ .EC2_JSON_PLACEHOLDER }} {{ else }} undefined {{ end }}
-		    var s3 = {{ if .S3_JSON_PLACEHOLDER }} {{ .S3_JSON_PLACEHOLDER }} {{ else }} undefined {{ end }}
+		    var ec2 = {{ if .EC2_JSON_PLACEHOLDER }}{{ .EC2_JSON_PLACEHOLDER }}{{ else }}undefined{{ end }}
+		    var s3 = {{ if .S3_JSON_PLACEHOLDER }}{{ .S3_JSON_PLACEHOLDER }}{{ else }}undefined{{ end }}
 		   
 		    var HEADERS = {
 		      volume_report: "Volume report",
