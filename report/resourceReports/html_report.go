@@ -109,4 +109,3 @@ func GetHtmlTemplate() string {
 		</html>
 	`
 }
-g
