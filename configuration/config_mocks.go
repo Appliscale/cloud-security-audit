@@ -1,9 +1,9 @@
 package configuration
 
 import (
-	"github.com/Appliscale/cloud-security-audit/logger"
 	"github.com/Appliscale/cloud-security-audit/csasession/clientfactory/mocks"
 	"github.com/Appliscale/cloud-security-audit/csasession/sessionfactory"
+	"github.com/Appliscale/cloud-security-audit/logger"
 	"testing"
 )
 

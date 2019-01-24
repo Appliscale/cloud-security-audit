@@ -2,28 +2,21 @@ package environment
 
 import (
 	"bufio"
-	"github.com/Appliscale/perun/helpers"
 	"github.com/Appliscale/cloud-security-audit/configuration"
+	"github.com/Appliscale/perun/helpers"
+	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"os"
 	"strconv"
 	"strings"
 )
 
-var regions = []string{
-	"us-east-1",
-	"us-east-2",
-	"us-west-1",
-	"us-west-2",
-	"ca-central-1",
-	"ca-central-1",
-	"eu-west-1",
-	"eu-west-2",
-	"ap-northeast-1",
-	"ap-northeast-2",
-	"ap-southeast-1",
-	"ap-southeast-2",
-	"ap-south-1",
-	"sa-east-1",
+var Regions = []string{}
+
+func getAllRegions() {
+	rs, _ := endpoints.RegionsForService(endpoints.DefaultPartitions(), endpoints.AwsPartitionID, endpoints.ApigatewayServiceID) //apigateway
+	for region := range rs {
+		Regions = append(Regions, region)
+	}
 }
 
 func CheckAWSConfigFiles(config *configuration.Config) bool {
@@ -44,7 +37,7 @@ func CheckAWSConfigFiles(config *configuration.Config) bool {
 	}
 
 	profile := config.Profile
-
+	getAllRegions()
 	if configAWSExists {
 		profilesInConfig := getProfilesFromFile(config, homeDir+"/.aws/config")
 		if !helpers.SliceContains(profilesInConfig, profile) {
@@ -109,16 +102,16 @@ func getUserRegion(config *configuration.Config) string {
 		config.Logger.Always("Try again, invalid region")
 		config.Logger.GetInput("Region", &numberRegion)
 	}
-	region := regions[numberRegion]
+	region := Regions[numberRegion]
 	config.Logger.Always("Your region is: " + region)
 	return region
 }
 
 func showAvailableRegions(config *configuration.Config) {
 	config.Logger.Always("Available Regions:")
-	for i := 0; i < len(regions); i++ {
+	for i := 0; i < len(Regions); i++ {
 		pom := strconv.Itoa(i)
-		config.Logger.Always("Number " + pom + " region " + regions[i])
+		config.Logger.Always("Number " + pom + " region " + Regions[i])
 	}
 }
 
@@ -168,3 +161,43 @@ func getProfilesFromFile(config *configuration.Config, path string) []string {
 	}
 	return profiles
 }
+
+// func getAllRegions() {
+// 	url := "https://docs.aws.amazon.com/general/latest/gr/rande.html"
+// 	fmt.Printf("HTML code of %s ...\n", url)
+// 	resp, err := http.Get(url)
+// 	// handle the error if there is one
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	// do this now so it won't be forgotten
+// 	defer resp.Body.Close()
+// 	// reads html as a slice of bytes
+// 	html, err := ioutil.ReadAll(resp.Body)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	// show the HTML code as a string %s
+// 	fmt.Println(string(html[1]))
+// 	SaveToFile(string(html), "/home/sylwia/Desktop/html.html")
+// }
+
+// func SaveToFile(res string, path string) {
+// 	wholePath := strings.Split(path, "/")
+// 	var newpath string
+// 	for i := 0; i < len(wholePath)-1; i++ {
+// 		newpath += "/" + wholePath[i]
+// 	}
+// 	os.MkdirAll(newpath, os.ModePerm)
+// 	file, err := os.Create(path)
+// 	defer file.Close()
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return
+// 	}
+// 	obj, _ := yaml.Marshal(res)
+// 	_, err = file.Write(obj)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 	}
+// }
