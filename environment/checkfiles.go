@@ -10,14 +10,7 @@ import (
 	"strings"
 )
 
-var Regions = []string{}
-
-func getAllRegions() {
-	rs, _ := endpoints.RegionsForService(endpoints.DefaultPartitions(), endpoints.AwsPartitionID, endpoints.ApigatewayServiceID) //apigateway
-	for region := range rs {
-		Regions = append(Regions, region)
-	}
-}
+var regions []string
 
 func CheckAWSConfigFiles(config *configuration.Config) bool {
 	homeDir, pathError := GetUserHomeDir()
@@ -25,7 +18,6 @@ func CheckAWSConfigFiles(config *configuration.Config) bool {
 		config.Logger.Error(pathError.Error())
 		return false
 	}
-
 	configAWSExists, configError := isAWSConfigPresent(homeDir)
 	if configError != nil {
 		config.Logger.Error(configError.Error())
@@ -37,7 +29,6 @@ func CheckAWSConfigFiles(config *configuration.Config) bool {
 	}
 
 	profile := config.Profile
-	getAllRegions()
 	if configAWSExists {
 		profilesInConfig := getProfilesFromFile(config, homeDir+"/.aws/config")
 		if !helpers.SliceContains(profilesInConfig, profile) {
@@ -93,25 +84,40 @@ func isCredentialsPresent(homePath string) (bool, error) {
 	return true, nil
 }
 
+func getAllRegions() []string {
+	var regions []string
+	rs, _ := endpoints.RegionsForService(endpoints.DefaultPartitions(), endpoints.AwsPartitionID, endpoints.ApigatewayServiceID)
+	for region := range rs {
+		regions = append(regions, region)
+	}
+	return regions
+}
+
 func getUserRegion(config *configuration.Config) string {
+	if len(regions) <= 0 {
+		regions = getAllRegions()
+	}
 	showAvailableRegions(config)
 	var numberRegion int
 	config.Logger.GetInput("Region", &numberRegion)
 
-	for numberRegion < 0 || numberRegion >= 14 {
+	for numberRegion < 0 || numberRegion >= len(regions) {
 		config.Logger.Always("Try again, invalid region")
 		config.Logger.GetInput("Region", &numberRegion)
 	}
-	region := Regions[numberRegion]
+	region := regions[numberRegion]
 	config.Logger.Always("Your region is: " + region)
 	return region
 }
 
 func showAvailableRegions(config *configuration.Config) {
+	if len(regions) <= 0 {
+		regions = getAllRegions()
+	}
 	config.Logger.Always("Available Regions:")
-	for i := 0; i < len(Regions); i++ {
+	for i := 0; i < len(regions); i++ {
 		pom := strconv.Itoa(i)
-		config.Logger.Always("Number " + pom + " region " + Regions[i])
+		config.Logger.Always("Number " + pom + " region " + regions[i])
 	}
 }
 
