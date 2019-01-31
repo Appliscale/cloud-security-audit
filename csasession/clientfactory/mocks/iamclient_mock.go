@@ -35,7 +35,6 @@ func (m *MockIAMClient) EXPECT() *MockIAMClientMockRecorder {
 
 // ListUsers mocks base method
 func (m *MockIAMClient) ListUsers(input *iam.GetAccountAuthorizationDetailsInput) (*iam.GetAccountAuthorizationDetailsOutput, error) {
-	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListUsers", input)
 	ret0, _ := ret[0].(*iam.GetAccountAuthorizationDetailsOutput)
 	ret1, _ := ret[1].(error)
@@ -44,13 +43,11 @@ func (m *MockIAMClient) ListUsers(input *iam.GetAccountAuthorizationDetailsInput
 
 // ListUsers indicates an expected call of ListUsers
 func (mr *MockIAMClientMockRecorder) ListUsers(input interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListUsers", reflect.TypeOf((*MockIAMClient)(nil).ListUsers), input)
 }
 
 // ListAccessKeys mocks base method
 func (m *MockIAMClient) ListAccessKeys(input *iam.ListAccessKeysInput) (*iam.ListAccessKeysOutput, error) {
-	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListAccessKeys", input)
 	ret0, _ := ret[0].(*iam.ListAccessKeysOutput)
 	ret1, _ := ret[1].(error)
@@ -59,6 +56,5 @@ func (m *MockIAMClient) ListAccessKeys(input *iam.ListAccessKeysInput) (*iam.Lis
 
 // ListAccessKeys indicates an expected call of ListAccessKeys
 func (mr *MockIAMClientMockRecorder) ListAccessKeys(input interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAccessKeys", reflect.TypeOf((*MockIAMClient)(nil).ListAccessKeys), input)
 }

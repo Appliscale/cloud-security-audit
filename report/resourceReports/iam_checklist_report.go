@@ -1,10 +1,15 @@
-package report
+package resourceReports
 
 import (
 	"fmt"
 	"github.com/Appliscale/cloud-security-audit/configuration"
 	"github.com/Appliscale/cloud-security-audit/resource"
 	//"github.com/aws/aws-sdk-go/service/iam"
+	"encoding/json"
+	"github.com/Appliscale/cloud-security-audit/report"
+	"os"
+	"strconv"
+	"strings"
 )
 
 type IAMItem struct {
@@ -25,7 +30,7 @@ type IAMChecklistRequiredResources struct {
 	IAMInfo *resource.IAMInfo
 }
 
-func (i *IAMChecklist) GetHeaders() []string {
+func (i *IAMChecklist) GetTableHeaders() []string {
 	return []string{"Guideline", "Status"}
 }
 
@@ -41,6 +46,39 @@ func (i *IAMChecklist) FormatDataToTable() [][]string {
 	}
 
 	return data
+}
+
+func (i *IAMChecklist) GetJsonReport() []byte {
+	output, err := json.Marshal(i)
+	if err == nil {
+		return output
+	}
+	report.ReportLogger.Error("Error generating Json report")
+	os.Exit(1)
+	return []byte{}
+}
+
+func (i *IAMChecklist) PrintHtmlReport(*os.File) error {
+	//	TODO:
+	return nil
+}
+
+func (i IAMChecklist) GetCsvReport() []byte {
+	const externalSep = ","
+
+	csv := []string{strings.Join([]string{
+		"\"Name\"",
+		"\"Value\""}, externalSep)}
+
+	for _, row := range i {
+		s := strings.Join([]string{
+			row.Name,
+			strconv.FormatBool(row.Value)}, externalSep)
+
+		csv = append(csv, s)
+	}
+
+	return []byte(strings.Join(csv, "\n"))
 }
 
 func (i *IAMChecklist) GenerateReport(r *IAMReportRequiredResources) {

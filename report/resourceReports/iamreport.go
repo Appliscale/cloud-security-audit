@@ -1,10 +1,14 @@
-package report
+package resourceReports
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/Appliscale/cloud-security-audit/configuration"
+	"github.com/Appliscale/cloud-security-audit/report"
 	"github.com/Appliscale/cloud-security-audit/resource"
 	"github.com/aws/aws-sdk-go/service/iam"
+	"os"
+	"strconv"
 	"strings"
 )
 
@@ -29,7 +33,7 @@ type IAMReportRequiredResources struct {
 	IAMInfo *resource.IAMInfo
 }
 
-func (i *IAMReports) GetHeaders() []string {
+func (i *IAMReports) GetTableHeaders() []string {
 	return []string{"User name", "Groups", "# of Inline\npolicies"}
 }
 
@@ -46,6 +50,41 @@ func (i *IAMReports) FormatDataToTable() [][]string {
 	}
 
 	return data
+}
+
+func (i *IAMReports) GetJsonReport() []byte {
+	output, err := json.Marshal(i)
+	if err == nil {
+		return output
+	}
+	report.ReportLogger.Error("Error generating Json report")
+	os.Exit(1)
+	return []byte{}
+}
+
+func (i *IAMReports) PrintHtmlReport(*os.File) error {
+	//	TODO:
+	return nil
+}
+
+func (i IAMReports) GetCsvReport() []byte {
+	const externalSep = ","
+
+	csv := []string{strings.Join([]string{
+		"\"UserName\"",
+		"\"Groups\"",
+		"\"Inline Policies\""}, externalSep)}
+
+	for _, row := range i {
+		s := strings.Join([]string{
+			row.UserName,
+			row.Groups,
+			strconv.FormatInt(int64(row.InlinePolicies), 10)}, externalSep)
+
+		csv = append(csv, s)
+	}
+
+	return []byte(strings.Join(csv, "\n"))
 }
 
 func (i *IAMReports) GenerateReport(r *IAMReportRequiredResources) {
