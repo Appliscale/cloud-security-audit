@@ -4,8 +4,8 @@ import (
 	"os"
 
 	"github.com/Appliscale/cloud-security-audit/configuration"
-	"github.com/Appliscale/cloud-security-audit/resource"
 	"github.com/Appliscale/cloud-security-audit/csasession"
+	"github.com/Appliscale/cloud-security-audit/resource"
 
 	"github.com/Appliscale/cloud-security-audit/environment"
 	"github.com/Appliscale/cloud-security-audit/scanner"
