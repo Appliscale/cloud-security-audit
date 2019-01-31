@@ -35,6 +35,7 @@ func (m *MockKmsClient) EXPECT() *MockKmsClientMockRecorder {
 
 // ListKeys mocks base method
 func (m *MockKmsClient) ListKeys(input *kms.ListKeysInput) (*kms.ListKeysOutput, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListKeys", input)
 	ret0, _ := ret[0].(*kms.ListKeysOutput)
 	ret1, _ := ret[1].(error)
@@ -43,11 +44,13 @@ func (m *MockKmsClient) ListKeys(input *kms.ListKeysInput) (*kms.ListKeysOutput,
 
 // ListKeys indicates an expected call of ListKeys
 func (mr *MockKmsClientMockRecorder) ListKeys(input interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListKeys", reflect.TypeOf((*MockKmsClient)(nil).ListKeys), input)
 }
 
 // ListAliases mocks base method
 func (m *MockKmsClient) ListAliases(input *kms.ListAliasesInput) (*kms.ListAliasesOutput, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListAliases", input)
 	ret0, _ := ret[0].(*kms.ListAliasesOutput)
 	ret1, _ := ret[1].(error)
@@ -56,5 +59,6 @@ func (m *MockKmsClient) ListAliases(input *kms.ListAliasesInput) (*kms.ListAlias
 
 // ListAliases indicates an expected call of ListAliases
 func (mr *MockKmsClientMockRecorder) ListAliases(input interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAliases", reflect.TypeOf((*MockKmsClient)(nil).ListAliases), input)
 }

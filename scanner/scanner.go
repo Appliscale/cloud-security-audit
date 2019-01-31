@@ -34,6 +34,20 @@ func Run(config *configuration.Config) error {
 			}
 			s3BucketReports.GenerateReport(resources)
 			config.PrintFormat(&s3BucketReports, config.OutputFile)
+		case "iam":
+			config.Logger.Info("Gathering information about IAM...")
+			iamReports := report.IAMReports{}
+			resources, err := iamReports.GetResources(config)
+			if err != nil {
+				return err
+			}
+			iamReports.GenerateReport(resources)
+			report.PrintTable(&iamReports)
+
+			iamChecklist := report.IAMChecklist{}
+			iamChecklist.GenerateReport(resources)
+			report.PrintTable(&iamChecklist)
+
 		default:
 			return fmt.Errorf("Wrong service name: %s", service)
 		}
