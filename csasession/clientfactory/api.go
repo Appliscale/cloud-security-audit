@@ -2,6 +2,7 @@ package clientfactory
 
 import (
 	"github.com/Appliscale/cloud-security-audit/csasession"
+	"github.com/aws/aws-sdk-go/service/iam"
 
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/kms"
@@ -12,6 +13,7 @@ type ClientFactory interface {
 	GetKmsClient(config csasession.SessionConfig) (KmsClient, error)
 	GetEc2Client(config csasession.SessionConfig) (EC2Client, error)
 	GetS3Client(config csasession.SessionConfig) (S3Client, error)
+	GetIAMClient(config csasession.SessionConfig) (IAMClient, error)
 }
 
 // GetKmsClient creates a new KMS client from cached session.
@@ -45,4 +47,15 @@ func (factory *ClientFactoryAWS) GetS3Client(config csasession.SessionConfig) (S
 
 	client := s3.New(sess)
 	return AWSS3Client{api: client}, nil
+}
+
+// GetIAMClient creates a new IAM client from cached session.
+func (factory *ClientFactoryAWS) GetIAMClient(config csasession.SessionConfig) (IAMClient, error) {
+	sess, err := factory.sessionFactory.GetSession(config)
+	if err != nil {
+		return nil, err
+	}
+
+	client := iam.New(sess)
+	return AWSIAMClient{api: client}, nil
 }
