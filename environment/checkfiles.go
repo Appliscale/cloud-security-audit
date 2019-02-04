@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-var regions []string
+var regions = GetAllRegions()
 
 func CheckAWSConfigFiles(config *configuration.Config) bool {
 	homeDir, pathError := GetUserHomeDir()
@@ -84,40 +84,35 @@ func isCredentialsPresent(homePath string) (bool, error) {
 	return true, nil
 }
 
-func getAllRegions() []string {
-	var regions []string
-	rs, _ := endpoints.RegionsForService(endpoints.DefaultPartitions(), endpoints.AwsPartitionID, endpoints.ApigatewayServiceID)
-	for region := range rs {
-		regions = append(regions, region)
+func GetAllRegions() (regions []string) {
+	if len(regions) <= 0 {
+		rs, _ := endpoints.RegionsForService(endpoints.DefaultPartitions(), endpoints.AwsPartitionID, endpoints.ApigatewayServiceID)
+		for region := range rs {
+			regions = append(regions, region)
+		}
 	}
-	return regions
+	return
 }
 
 func getUserRegion(config *configuration.Config) string {
-	if len(regions) <= 0 {
-		regions = getAllRegions()
-	}
 	showAvailableRegions(config)
 	var numberRegion int
 	config.Logger.GetInput("Region", &numberRegion)
 
-	for numberRegion < 0 || numberRegion >= len(regions) {
+	for numberRegion < 0 || numberRegion >= len(GetAllRegions()) {
 		config.Logger.Always("Try again, invalid region")
 		config.Logger.GetInput("Region", &numberRegion)
 	}
-	region := regions[numberRegion]
+	region := GetAllRegions()[numberRegion]
 	config.Logger.Always("Your region is: " + region)
 	return region
 }
 
 func showAvailableRegions(config *configuration.Config) {
-	if len(regions) <= 0 {
-		regions = getAllRegions()
-	}
 	config.Logger.Always("Available Regions:")
-	for i := 0; i < len(regions); i++ {
+	for i := 0; i < len(GetAllRegions()); i++ {
 		pom := strconv.Itoa(i)
-		config.Logger.Always("Number " + pom + " region " + regions[i])
+		config.Logger.Always("Number " + pom + " region " + GetAllRegions()[i])
 	}
 }
 
