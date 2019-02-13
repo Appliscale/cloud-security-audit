@@ -8,12 +8,16 @@ import (
 	"github.com/Appliscale/cloud-security-audit/resource"
 
 	"github.com/Appliscale/cloud-security-audit/environment"
+	"github.com/Appliscale/cloud-security-audit/report"
 	"github.com/Appliscale/cloud-security-audit/scanner"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 // var cfgFile string
 var config = configuration.GetConfig()
+
+const STDOUT = "stdout"
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -45,6 +49,8 @@ var (
 	profile     string
 	mfa         bool
 	mfaDuration int64
+	format      string
+	outputFile  string
 )
 
 func init() {
@@ -58,6 +64,8 @@ func init() {
 
 	rootCmd.Flags().BoolVarP(&mfa, "mfa", "m", false, "indicates usage of Multi Factor Authentication")
 	rootCmd.Flags().Int64VarP(&mfaDuration, "mfa-duration", "d", 0, "sets the duration of the MFA session")
+	rootCmd.Flags().StringVarP(&format, "format", "f", "TABLE", "specifies output format, available are: JSON, HTML, CSV, TABLE")
+	rootCmd.Flags().StringVarP(&outputFile, "output", "o", "STDOUT", "specify output file")
 }
 
 func getRegions() *[]string {
@@ -88,10 +96,54 @@ func getProfile() string {
 	return "default"
 }
 
+var printFormats = map[string]func(report.Report, *os.File){"TABLE": report.PrintTable, "JSON": report.PrintJsonReport, "HTML": report.PrintHtmlReport, "CSV": report.PrintCSVReport}
+
+func getFormat() func(report.Report, *os.File) {
+	for formatName, formatValue := range printFormats {
+		if format == formatName {
+			return formatValue
+		}
+	}
+	config.Logger.Error("Wrong type: " + format + " Available are: TABLE, JSON, HTML, CSV. Using default: TABLE")
+	return report.PrintTable
+}
+
+func getOutputFile() *os.File {
+	var ans string
+	if strings.ToLower(outputFile) == STDOUT {
+		return os.Stdout
+	}
+
+	if _, err := os.Stat(outputFile); err == nil {
+		config.Logger.GetInput("file "+outputFile+" already exists. Do you want to override it? [Y/n]", &ans)
+		if strings.ToLower(ans) == "y" || strings.ToLower(ans) == "yes" || ans == "" {
+			f, err := os.Create(outputFile)
+			if err != nil {
+				panic(err)
+			}
+			return f
+		} else {
+			os.Exit(1)
+		}
+	} else if os.IsNotExist(err) {
+		f, err := os.Create(outputFile)
+		if err != nil {
+			os.Exit(1)
+		}
+		return f
+	} else {
+		config.Logger.Error("Cannot determine if file " + outputFile + " exists")
+		os.Exit(1)
+	}
+	return os.Stdout
+}
+
 func initConfig() {
 	config.Regions = getRegions()
 	config.Services = getServices()
 	config.Profile = getProfile()
+	config.PrintFormat = getFormat()
+	config.OutputFile = getOutputFile()
 	config.Mfa = mfa
 	config.MfaDuration = mfaDuration
 	configuration.InitialiseMFA(config)

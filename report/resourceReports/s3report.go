@@ -1,12 +1,16 @@
-package report
+package resourceReports
 
 import (
+	"encoding/json"
+	"html/template"
 	"strconv"
 	"strings"
 
 	"github.com/Appliscale/cloud-security-audit/configuration"
+	"github.com/Appliscale/cloud-security-audit/report"
 	"github.com/Appliscale/cloud-security-audit/resource"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"os"
 )
 
 const action = "Action"
@@ -14,11 +18,11 @@ const effect = "Effect"
 const principal = "Principal"
 
 type S3BucketReport struct {
-	Name string
-	EncryptionType
-	LoggingEnabled bool
-	ACLIsPublic    string
-	PolicyIsPublic string
+	Name                  string `json:"name"`
+	report.EncryptionType `json:"encryption_type"`
+	LoggingEnabled        bool   `json:"logging_enabled"`
+	ACLIsPublic           string `json:"acl_is_public"`
+	PolicyIsPublic        string `json:"policy_is_public"`
 }
 
 type S3BucketReports []*S3BucketReport
@@ -28,25 +32,76 @@ type S3ReportRequiredResources struct {
 	S3Buckets *resource.S3Buckets
 }
 
+func (s3brs S3BucketReports) GetJsonReport() []byte {
+	output, err := json.Marshal(s3brs)
+	if err == nil {
+		return output
+	}
+	report.ReportLogger.Error("Error generating Json report")
+	os.Exit(1)
+	return []byte{}
+}
+
+func (s3brs S3BucketReports) PrintHtmlReport(outputFile *os.File) error {
+	data := s3brs.GetJsonReport()
+	reportTemplate := GetHtmlTemplate()
+
+	tmpl, err := template.New("report_template").Parse(reportTemplate)
+	if err != nil {
+		report.ReportLogger.Error("Can not parse reportTemplate")
+	}
+
+	err = tmpl.Execute(outputFile, map[string]string{"S3_JSON_PLACEHOLDER": string(data)})
+	if err != nil {
+		report.ReportLogger.Error("Can not execute reportTemplate")
+	}
+
+	return err
+}
+
+func (s3brs S3BucketReports) GetCsvReport() []byte {
+	const externalSep = ","
+
+	csv := []string{strings.Join([]string{
+		"\"Bucket Name\"",
+		"\"Default SSE\"",
+		"\"Logging Enabled\"",
+		"\"ACL public permission\"",
+		"\"Policy public permissions\""}, externalSep)}
+
+	for _, row := range s3brs {
+		s := strings.Join([]string{
+			row.Name,
+			strconv.FormatInt(int64(row.EncryptionType), 10),
+			strconv.FormatBool(row.LoggingEnabled),
+			row.ACLIsPublic,
+			row.PolicyIsPublic}, externalSep)
+
+		csv = append(csv, s)
+	}
+
+	return []byte(strings.Join(csv, "\n"))
+}
+
 // CheckEncryptionType : Returns Encryption Type (AES256, CKMS, DKMS, NONE)
 func (s3br *S3BucketReport) CheckEncryptionType(s3EncryptionType s3.ServerSideEncryptionByDefault, kmsKeys *resource.KMSKeys) {
 
 	switch *s3EncryptionType.SSEAlgorithm {
 	case "AES256":
-		s3br.EncryptionType = AES256
+		s3br.EncryptionType = report.AES256
 	case "aws:kms":
 		kmsKey := kmsKeys.FindByKeyArn(*s3EncryptionType.KMSMasterKeyID)
 		if kmsKey.Custom {
-			s3br.EncryptionType = CKMS
+			s3br.EncryptionType = report.CKMS
 		} else {
-			s3br.EncryptionType = DKMS
+			s3br.EncryptionType = report.DKMS
 		}
 	default:
-		s3br.EncryptionType = NONE
+		s3br.EncryptionType = report.NONE
 	}
 }
 
-func (s3brs *S3BucketReports) GetHeaders() []string {
+func (s3brs *S3BucketReports) GetTableHeaders() []string {
 	return []string{"Bucket Name", "Default\nSSE", "Logging\nEnabled", "ACL\nis public\nR - Read\nW - Write\nD - Delete", "Policy\nis public\nR - Read\nW - Write\nD - Delete"}
 }
 
@@ -188,7 +243,7 @@ func (s3brs *S3BucketReports) GenerateReport(r *S3ReportRequiredResources) {
 		if v := s3Bucket.ServerSideEncryptionConfiguration; v != nil {
 			s3BucketReport.CheckEncryptionType(*v.Rules[0].ApplyServerSideEncryptionByDefault, r.KMSKeys)
 		} else {
-			s3BucketReport.EncryptionType = NONE
+			s3BucketReport.EncryptionType = report.NONE
 			ok = false
 		}
 		if s3Bucket.LoggingEnabled != nil {

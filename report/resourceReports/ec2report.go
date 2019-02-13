@@ -1,21 +1,26 @@
-package report
+package resourceReports
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"github.com/Appliscale/cloud-security-audit/configuration"
 	"github.com/Appliscale/cloud-security-audit/environment"
+	"github.com/Appliscale/cloud-security-audit/report"
 	"github.com/Appliscale/cloud-security-audit/resource"
+	"html/template"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
 )
 
 type Ec2Report struct {
-	VolumeReport      *VolumeReport
-	InstanceID        string
-	SortableTags      *SortableTags
-	SecurityGroupsIDs []string
-	AvailabilityZone  string
+	VolumeReport      *VolumeReport `json:"volume_report"`
+	InstanceID        string        `json:"instance_id"`
+	SortableTags      *SortableTags `json:"sortable_tags"`
+	SecurityGroupsIDs []string      `json:"security_groups_ids"`
+	AvailabilityZone  string        `json:"availability_zone"`
 }
 
 func NewEc2Report(instanceID string) *Ec2Report {
@@ -36,7 +41,64 @@ type Ec2ReportRequiredResources struct {
 	AvailabilityZone string
 }
 
-func (e *Ec2Reports) GetHeaders() []string {
+func (e Ec2Reports) GetJsonReport() []byte {
+	output, err := json.Marshal(e)
+	if err == nil {
+		return output
+	}
+	report.ReportLogger.Error("Error generating Json report")
+	os.Exit(1)
+	return []byte{}
+}
+
+func (e Ec2Reports) PrintHtmlReport(outputFile *os.File) error {
+	data := e.GetJsonReport()
+	reportTemplate := GetHtmlTemplate()
+
+	tmpl, err := template.New("report_template").Parse(reportTemplate)
+	if err != nil {
+		report.ReportLogger.Error("Can not parse reportTemplate")
+	}
+
+	err = tmpl.Execute(outputFile, map[string]string{"EC2_JSON_PLACEHOLDER": string(data)})
+	if err != nil {
+		report.ReportLogger.Error("Can not execute reportTemplate")
+	}
+
+	return err
+}
+
+func (e Ec2Reports) GetCsvReport() []byte {
+	const internalSep = ";"
+	const externalSep = ","
+
+	csv := []string{strings.Join([]string{
+		"\"Availability Zone\"",
+		"\"EC2\"",
+		"\"Volumes encrypton\"",
+		"\"Open Security Groups\"",
+		"\"EC2 Tags\"",
+	}, externalSep)}
+
+	for _, row := range e {
+		rowStr := make([]string, 0)
+
+		rowStr = append(rowStr, strings.Join(*row.VolumeReport, internalSep))
+		rowStr = append(rowStr, row.InstanceID)
+
+		for tag, val := range row.SortableTags.Tags {
+			rowStr = append(rowStr, fmt.Sprintf("%s%s%s", tag, internalSep, val))
+		}
+
+		rowStr = append(rowStr, strings.Join(row.SecurityGroupsIDs, internalSep))
+
+		csv = append(csv, strings.Join(rowStr, externalSep))
+	}
+
+	return []byte(strings.Join(csv, "\n"))
+}
+
+func (e *Ec2Reports) GetTableHeaders() []string {
 	return []string{"Availability\nZone", "EC2", "Volumes\n(None) - not encrypted\n(DKMS) - encrypted with default KMSKey", "Security\nGroups\n(Incoming CIDR = 0\x2E0\x2E0\x2E0/0)\nID : PROTOCOL : PORT", "EC2 Tags"}
 }
 
@@ -65,12 +127,12 @@ func (e *Ec2Reports) GenerateReport(r *Ec2ReportRequiredResources) {
 			volume := r.Volumes.FindById(*blockDeviceMapping.Ebs.VolumeId)
 			if !*volume.Encrypted {
 				ec2OK = false
-				ec2Report.VolumeReport.AddEBS(*volume.VolumeId, NONE)
+				ec2Report.VolumeReport.AddEBS(*volume.VolumeId, report.NONE)
 			} else {
 				kmskey := r.KMSKeys.FindByKeyArn(*volume.KmsKeyId)
 				if !kmskey.Custom {
 					ec2OK = false
-					ec2Report.VolumeReport.AddEBS(*volume.VolumeId, DKMS)
+					ec2Report.VolumeReport.AddEBS(*volume.VolumeId, report.DKMS)
 				}
 			}
 		}

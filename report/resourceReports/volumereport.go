@@ -1,13 +1,14 @@
-package report
+package resourceReports
 
 import (
 	"bytes"
 	"fmt"
+	"github.com/Appliscale/cloud-security-audit/report"
 )
 
 type VolumeReport []string
 
-func (v *VolumeReport) AddEBS(volumeID string, encryptionType EncryptionType) {
+func (v *VolumeReport) AddEBS(volumeID string, encryptionType report.EncryptionType) {
 	*v = append(*v, volumeID+fmt.Sprintf("[%s]", encryptionType.String()))
 }
 

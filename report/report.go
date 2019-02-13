@@ -1,25 +1,52 @@
 package report
 
 import (
+	"github.com/Appliscale/cloud-security-audit/logger"
 	"github.com/olekukonko/tablewriter"
 	"os"
 	"strings"
 )
 
+var ReportLogger = logger.CreateDefaultLogger()
+
 type Report interface {
 	FormatDataToTable() [][]string
-	GetHeaders() []string
+	GetTableHeaders() []string
+	GetJsonReport() []byte
+	PrintHtmlReport(*os.File) error
+	GetCsvReport() []byte
 }
 
-func PrintTable(r Report) {
+func handleOutput(output []byte, file *os.File) {
+	out := append(output, []byte("\n\n")...)
+	_, err := file.Write(out)
+	if err != nil {
+		panic(err)
+	}
+	file.Sync()
+}
+
+func PrintJsonReport(r Report, filename *os.File) {
+	handleOutput(r.GetJsonReport(), filename)
+}
+
+func PrintHtmlReport(r Report, filename *os.File) {
+	r.PrintHtmlReport(filename)
+}
+
+func PrintCSVReport(r Report, filename *os.File) {
+	handleOutput(r.GetCsvReport(), filename)
+}
+
+func PrintTable(r Report, file *os.File) {
 
 	data := r.FormatDataToTable()
 
-	table := tablewriter.NewWriter(os.Stdout)
+	table := tablewriter.NewWriter(file)
 	// Configure Headers
 	table.SetReflowDuringAutoWrap(false)
 	table.SetAutoFormatHeaders(false)
-	table.SetHeader(customFormatHeaders(r.GetHeaders()))
+	table.SetHeader(customFormatHeaders(r.GetTableHeaders()))
 	// Configure rows&cells
 	table.SetRowSeparator("-")
 	table.SetRowLine(true)

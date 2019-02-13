@@ -4,6 +4,8 @@ import (
 	"github.com/Appliscale/cloud-security-audit/csasession/clientfactory"
 	"github.com/Appliscale/cloud-security-audit/csasession/sessionfactory"
 	"github.com/Appliscale/cloud-security-audit/logger"
+	"github.com/Appliscale/cloud-security-audit/report"
+	"os"
 )
 
 type Config struct {
@@ -15,6 +17,8 @@ type Config struct {
 	Logger         *logger.Logger
 	Mfa            bool
 	MfaDuration    int64
+	PrintFormat    func(report.Report, *os.File)
+	OutputFile     *os.File
 }
 
 func GetConfig() (config Config) {
