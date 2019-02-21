@@ -5,11 +5,10 @@ import (
 
 	"github.com/Appliscale/cloud-security-audit/configuration"
 	"github.com/Appliscale/cloud-security-audit/csasession"
+	"github.com/Appliscale/cloud-security-audit/environment"
 	"github.com/Appliscale/cloud-security-audit/resource"
-
 	"github.com/Appliscale/cloud-security-audit/scanner"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 // var cfgFile string
@@ -21,24 +20,21 @@ var rootCmd = &cobra.Command{
 	Short: "Scan for vulnerabilities in your AWS Account.",
 	Long:  `Scan for vulnerabilities in your AWS Account.`,
 	Run: func(cmd *cobra.Command, args []string) {
-
-		// if environment.CheckAWSConfigFiles(&config) {
-
-		env, _ := os.LookupEnv("AWS_ACCESS_KEY_ID")
-		log.Println(env)
-
-		if env, ok := os.LookupEnv("AWS_SECRET_ACCESS_KEY"); ok {
-			log.Println(env)
-		}
-		if env, ok := os.LookupEnv("AWS_SESSION_TOKEN"); ok {
-			log.Println(env)
-		}
-		err := scanner.Run(&config)
-		if err != nil {
-			config.Logger.Error(err.Error())
+		_, ok := os.LookupEnv("AWS_ACCESS_KEY_ID") // If csa is running on lambda then env will be available. In other case csa needs config files.
+		if !ok {
+			if environment.CheckAWSConfigFiles(&config) {
+				err := scanner.Run(&config)
+				if err != nil {
+					config.Logger.Error(err.Error())
+				}
+			}
+		} else {
+			err := scanner.Run(&config)
+			if err != nil {
+				config.Logger.Error(err.Error())
+			}
 		}
 
-		// }
 	},
 }
 
