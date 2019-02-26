@@ -20,7 +20,7 @@ var rootCmd = &cobra.Command{
 	Short: "Scan for vulnerabilities in your AWS Account.",
 	Long:  `Scan for vulnerabilities in your AWS Account.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		_, ok := os.LookupEnv("AWS_ACCESS_KEY_ID") // If csa is running on lambda then env will be available. In other case csa needs config files.
+		_, ok := os.LookupEnv("AWS_LAMBDA_FUNCTION_NAME") // If csa is running on lambda then env will be available. In other case csa needs config files.
 		if !ok {
 			if environment.CheckAWSConfigFiles(&config) {
 				err := scanner.Run(&config)
