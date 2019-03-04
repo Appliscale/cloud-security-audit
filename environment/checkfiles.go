@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"github.com/Appliscale/cloud-security-audit/configuration"
 	"github.com/Appliscale/perun/helpers"
+	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"os"
 	"strconv"
 	"strings"

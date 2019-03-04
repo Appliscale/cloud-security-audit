@@ -35,7 +35,6 @@ func (m *MockEC2Client) EXPECT() *MockEC2ClientMockRecorder {
 
 // DescribeInstances mocks base method
 func (m *MockEC2Client) DescribeInstances(input *ec2.DescribeInstancesInput) (*ec2.DescribeInstancesOutput, error) {
-	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DescribeInstances", input)
 	ret0, _ := ret[0].(*ec2.DescribeInstancesOutput)
 	ret1, _ := ret[1].(error)
@@ -44,13 +43,11 @@ func (m *MockEC2Client) DescribeInstances(input *ec2.DescribeInstancesInput) (*e
 
 // DescribeInstances indicates an expected call of DescribeInstances
 func (mr *MockEC2ClientMockRecorder) DescribeInstances(input interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeInstances", reflect.TypeOf((*MockEC2Client)(nil).DescribeInstances), input)
 }
 
 // DescribeVolumes mocks base method
 func (m *MockEC2Client) DescribeVolumes(input *ec2.DescribeVolumesInput) (*ec2.DescribeVolumesOutput, error) {
-	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DescribeVolumes", input)
 	ret0, _ := ret[0].(*ec2.DescribeVolumesOutput)
 	ret1, _ := ret[1].(error)
@@ -59,13 +56,11 @@ func (m *MockEC2Client) DescribeVolumes(input *ec2.DescribeVolumesInput) (*ec2.D
 
 // DescribeVolumes indicates an expected call of DescribeVolumes
 func (mr *MockEC2ClientMockRecorder) DescribeVolumes(input interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeVolumes", reflect.TypeOf((*MockEC2Client)(nil).DescribeVolumes), input)
 }
 
 // DescribeSecurityGroups mocks base method
 func (m *MockEC2Client) DescribeSecurityGroups(input *ec2.DescribeSecurityGroupsInput) (*ec2.DescribeSecurityGroupsOutput, error) {
-	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DescribeSecurityGroups", input)
 	ret0, _ := ret[0].(*ec2.DescribeSecurityGroupsOutput)
 	ret1, _ := ret[1].(error)
@@ -74,13 +69,11 @@ func (m *MockEC2Client) DescribeSecurityGroups(input *ec2.DescribeSecurityGroups
 
 // DescribeSecurityGroups indicates an expected call of DescribeSecurityGroups
 func (mr *MockEC2ClientMockRecorder) DescribeSecurityGroups(input interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeSecurityGroups", reflect.TypeOf((*MockEC2Client)(nil).DescribeSecurityGroups), input)
 }
 
 // DescribeImages mocks base method
 func (m *MockEC2Client) DescribeImages(input *ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error) {
-	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DescribeImages", input)
 	ret0, _ := ret[0].(*ec2.DescribeImagesOutput)
 	ret1, _ := ret[1].(error)
@@ -89,13 +82,11 @@ func (m *MockEC2Client) DescribeImages(input *ec2.DescribeImagesInput) (*ec2.Des
 
 // DescribeImages indicates an expected call of DescribeImages
 func (mr *MockEC2ClientMockRecorder) DescribeImages(input interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeImages", reflect.TypeOf((*MockEC2Client)(nil).DescribeImages), input)
 }
 
 // DescribeSnapshots mocks base method
 func (m *MockEC2Client) DescribeSnapshots(input *ec2.DescribeSnapshotsInput) (*ec2.DescribeSnapshotsOutput, error) {
-	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DescribeSnapshots", input)
 	ret0, _ := ret[0].(*ec2.DescribeSnapshotsOutput)
 	ret1, _ := ret[1].(error)
@@ -104,6 +95,5 @@ func (m *MockEC2Client) DescribeSnapshots(input *ec2.DescribeSnapshotsInput) (*e
 
 // DescribeSnapshots indicates an expected call of DescribeSnapshots
 func (mr *MockEC2ClientMockRecorder) DescribeSnapshots(input interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DescribeSnapshots", reflect.TypeOf((*MockEC2Client)(nil).DescribeSnapshots), input)
 }
