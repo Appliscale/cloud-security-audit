@@ -9,22 +9,7 @@ import (
 	"strings"
 )
 
-var regions = []string{
-	"us-east-1",
-	"us-east-2",
-	"us-west-1",
-	"us-west-2",
-	"ca-central-1",
-	"ca-central-1",
-	"eu-west-1",
-	"eu-west-2",
-	"ap-northeast-1",
-	"ap-northeast-2",
-	"ap-southeast-1",
-	"ap-southeast-2",
-	"ap-south-1",
-	"sa-east-1",
-}
+var Regions = getAllRegions()
 
 func CheckAWSConfigFiles(config *configuration.Config) bool {
 	homeDir, pathError := GetUserHomeDir()
@@ -32,7 +17,6 @@ func CheckAWSConfigFiles(config *configuration.Config) bool {
 		config.Logger.Error(pathError.Error())
 		return false
 	}
-
 	configAWSExists, configError := isAWSConfigPresent(homeDir)
 	if configError != nil {
 		config.Logger.Error(configError.Error())
@@ -44,7 +28,6 @@ func CheckAWSConfigFiles(config *configuration.Config) bool {
 	}
 
 	profile := config.Profile
-
 	if configAWSExists {
 		profilesInConfig := getProfilesFromFile(config, homeDir+"/.aws/config")
 		if !helpers.SliceContains(profilesInConfig, profile) {
@@ -100,25 +83,33 @@ func isCredentialsPresent(homePath string) (bool, error) {
 	return true, nil
 }
 
+func getAllRegions() (Regions []string) {
+	rs, _ := endpoints.RegionsForService(endpoints.DefaultPartitions(), endpoints.AwsPartitionID, endpoints.ApigatewayServiceID)
+	for region := range rs {
+		Regions = append(Regions, region)
+	}
+	return
+}
+
 func getUserRegion(config *configuration.Config) string {
 	showAvailableRegions(config)
 	var numberRegion int
 	config.Logger.GetInput("Region", &numberRegion)
 
-	for numberRegion < 0 || numberRegion >= 14 {
+	for numberRegion < 0 || numberRegion >= len(Regions) {
 		config.Logger.Always("Try again, invalid region")
 		config.Logger.GetInput("Region", &numberRegion)
 	}
-	region := regions[numberRegion]
+	region := Regions[numberRegion]
 	config.Logger.Always("Your region is: " + region)
 	return region
 }
 
 func showAvailableRegions(config *configuration.Config) {
 	config.Logger.Always("Available Regions:")
-	for i := 0; i < len(regions); i++ {
+	for i := 0; i < len(Regions); i++ {
 		pom := strconv.Itoa(i)
-		config.Logger.Always("Number " + pom + " region " + regions[i])
+		config.Logger.Always("Number " + pom + " region " + Regions[i])
 	}
 }
 

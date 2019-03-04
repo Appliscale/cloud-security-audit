@@ -35,6 +35,7 @@ func (m *MockS3Client) EXPECT() *MockS3ClientMockRecorder {
 
 // GetBucketPolicy mocks base method
 func (m *MockS3Client) GetBucketPolicy(input *s3.GetBucketPolicyInput) (*s3.GetBucketPolicyOutput, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetBucketPolicy", input)
 	ret0, _ := ret[0].(*s3.GetBucketPolicyOutput)
 	ret1, _ := ret[1].(error)
@@ -43,11 +44,13 @@ func (m *MockS3Client) GetBucketPolicy(input *s3.GetBucketPolicyInput) (*s3.GetB
 
 // GetBucketPolicy indicates an expected call of GetBucketPolicy
 func (mr *MockS3ClientMockRecorder) GetBucketPolicy(input interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBucketPolicy", reflect.TypeOf((*MockS3Client)(nil).GetBucketPolicy), input)
 }
 
 // GetBucketEncryption mocks base method
 func (m *MockS3Client) GetBucketEncryption(input *s3.GetBucketEncryptionInput) (*s3.GetBucketEncryptionOutput, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetBucketEncryption", input)
 	ret0, _ := ret[0].(*s3.GetBucketEncryptionOutput)
 	ret1, _ := ret[1].(error)
@@ -56,11 +59,13 @@ func (m *MockS3Client) GetBucketEncryption(input *s3.GetBucketEncryptionInput) (
 
 // GetBucketEncryption indicates an expected call of GetBucketEncryption
 func (mr *MockS3ClientMockRecorder) GetBucketEncryption(input interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBucketEncryption", reflect.TypeOf((*MockS3Client)(nil).GetBucketEncryption), input)
 }
 
 // GetBucketLogging mocks base method
 func (m *MockS3Client) GetBucketLogging(input *s3.GetBucketLoggingInput) (*s3.GetBucketLoggingOutput, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetBucketLogging", input)
 	ret0, _ := ret[0].(*s3.GetBucketLoggingOutput)
 	ret1, _ := ret[1].(error)
@@ -69,11 +74,13 @@ func (m *MockS3Client) GetBucketLogging(input *s3.GetBucketLoggingInput) (*s3.Ge
 
 // GetBucketLogging indicates an expected call of GetBucketLogging
 func (mr *MockS3ClientMockRecorder) GetBucketLogging(input interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBucketLogging", reflect.TypeOf((*MockS3Client)(nil).GetBucketLogging), input)
 }
 
 // GetBucketAcl mocks base method
 func (m *MockS3Client) GetBucketAcl(input *s3.GetBucketAclInput) (*s3.GetBucketAclOutput, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetBucketAcl", input)
 	ret0, _ := ret[0].(*s3.GetBucketAclOutput)
 	ret1, _ := ret[1].(error)
@@ -82,11 +89,13 @@ func (m *MockS3Client) GetBucketAcl(input *s3.GetBucketAclInput) (*s3.GetBucketA
 
 // GetBucketAcl indicates an expected call of GetBucketAcl
 func (mr *MockS3ClientMockRecorder) GetBucketAcl(input interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBucketAcl", reflect.TypeOf((*MockS3Client)(nil).GetBucketAcl), input)
 }
 
 // ListBuckets mocks base method
 func (m *MockS3Client) ListBuckets(input *s3.ListBucketsInput) (*s3.ListBucketsOutput, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListBuckets", input)
 	ret0, _ := ret[0].(*s3.ListBucketsOutput)
 	ret1, _ := ret[1].(error)
@@ -95,11 +104,13 @@ func (m *MockS3Client) ListBuckets(input *s3.ListBucketsInput) (*s3.ListBucketsO
 
 // ListBuckets indicates an expected call of ListBuckets
 func (mr *MockS3ClientMockRecorder) ListBuckets(input interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListBuckets", reflect.TypeOf((*MockS3Client)(nil).ListBuckets), input)
 }
 
 // GetBucketLocation mocks base method
 func (m *MockS3Client) GetBucketLocation(input *s3.GetBucketLocationInput) (*s3.GetBucketLocationOutput, error) {
+	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetBucketLocation", input)
 	ret0, _ := ret[0].(*s3.GetBucketLocationOutput)
 	ret1, _ := ret[1].(error)
@@ -108,5 +119,6 @@ func (m *MockS3Client) GetBucketLocation(input *s3.GetBucketLocationInput) (*s3.
 
 // GetBucketLocation indicates an expected call of GetBucketLocation
 func (mr *MockS3ClientMockRecorder) GetBucketLocation(input interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBucketLocation", reflect.TypeOf((*MockS3Client)(nil).GetBucketLocation), input)
 }
